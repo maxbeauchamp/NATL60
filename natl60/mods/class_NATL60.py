@@ -8,13 +8,13 @@ class NATL60:
         self.cmap="coolwarm"
         self.extent=[-80,0,25,65]
 
-    def sel_spatial(self,dim,extent):
+    def sel_spatial(self,extent):
         ''' '''
-        index=np.where( (convert_lon_360_180(self.data.longitude.values) >= extent[0]) &\
-                        (convert_lon_360_180(self.data.longitude.values) <= extent[1]) &\
-                        (np.asarray(self.data.latitude.values) >= extent[2]) &\
-                        (np.asarray(self.data.latitude.values) <= extent[3]) )[0]
-        self.data = self.data.isel({dim:index})
+        index = np.where( (convert_lon_360_180(self.data.longitude.values) >= extent[0]) &\
+                          (convert_lon_360_180(self.data.longitude.values) <= extent[1]) &\
+                          (self.data.latitude.values >= extent[2]) &\
+                          (self.data.latitude.values <= extent[3]) )[0]
+        self.data = self.data.isel(time=index)
 
     def gpd_fmt(self):
         ''' import via pandas and convert in geopandas '''

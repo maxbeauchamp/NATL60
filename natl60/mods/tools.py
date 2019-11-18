@@ -14,13 +14,13 @@ def mk_dir_recursive(dir_path):
 
 # function to convert lon from 0:360 to -180:180
 def convert_lon_360_180(lon):
-    return np.asarray(map(lambda x : ((x+180)%360)-180, lon))
+    return np.asarray([ ((x+180)%360)-180 for x in lon ])
 
 # generic function for cartopy-based mapping
 def make_map(extent):
    fig, ax = plt.subplots(figsize=(8, 7),
                           subplot_kw=dict(projection=ccrs.PlateCarree(central_longitude=0.0)))
-   ax.set_extent(extent)
+   ax.set_extent(list(extent))
    gl = ax.gridlines(alpha=0.5,draw_labels=True)
    gl.xformatter = LONGITUDE_FORMATTER
    gl.yformatter = LATITUDE_FORMATTER

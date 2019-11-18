@@ -8,9 +8,9 @@ class NATL60_fusion(NATL60):
         # define fake nadir cycles to merge with swot data
         nadir.data=nadir.data.drop('ncycle')
         nadir.data=nadir.data.expand_dims('nC')
+        _, index = np.unique(nadir.data['time'], return_index=True)
+        nadir.data=nadir.data.isel(time=index)
         nadir.data=nadir.data.stack(z=('nC', 'time'))
-        _, index = np.unique(nadir.data['z'], return_index=True)
-        nadir.data=nadir.data.isel(z=index)
         if swot.data is not None:
             self.data=xr.merge([nadir.data,swot.data])
         else:
