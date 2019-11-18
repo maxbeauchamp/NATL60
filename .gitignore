@@ -4,7 +4,8 @@
 # NATL60
 ##############################
 
-natl60/__pycache__
+*__pycache__*
+
 # Data
 alongtracks
 maps
