@@ -1,0 +1,18 @@
+# See more at https://www.gitignore.io
+
+##############################
+# NATL60
+##############################
+
+natl60/
+__pycache__
+
+# Data
+alongtracks
+maps
+swot
+fusion
+plots
+
+
+
