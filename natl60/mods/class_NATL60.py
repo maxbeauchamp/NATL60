@@ -37,7 +37,7 @@ class NATL60:
     def set_colormap(self, cmap):
         ''' '''
         self.cmap=cmap
-
+    
     def plot(self,file):
         ''' '''
         gdf = self.gpd_fmt()

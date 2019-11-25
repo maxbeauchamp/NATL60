@@ -1,6 +1,6 @@
-from .class_NATL60 import *
+from .class_NATL60_data import *
 
-class NATL60_nadir(NATL60):
+class NATL60_nadir(NATL60_data):
     ''' NATL60_nadir class definition'''
      
     @staticmethod
@@ -12,7 +12,7 @@ class NATL60_nadir(NATL60):
 
     def __init__(self,list_files):
         ''' '''
-        NATL60.__init__(self)
+        NATL60_data.__init__(self)
         if len(list_files)>0:
             self.data = xr.open_mfdataset(list_files, preprocess=self.preprocess)
             self.data = self.data.rename({'lon': 'longitude',\
@@ -53,6 +53,7 @@ class NATL60_nadir(NATL60):
             data_tmp = data_tmp.rename({'longitude': 'lon',\
                                          'latitude': 'lat',\
                                          'ssh': 'ssh_obs'}) 
+
             new_time = [(x-np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in data_tmp.time.values]
             data_tmp = data_tmp.assign(time=new_time)
             new_file = datapath+"/alongtracks/NATL60-CJM165_"+t+"_1d.nc"

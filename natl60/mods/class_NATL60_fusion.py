@@ -1,27 +1,27 @@
-from .class_NATL60 import *
+from .class_NATL60_data import *
 
-class NATL60_fusion(NATL60):
+class NATL60_fusion(NATL60_data):
  
-    def __init__(self,nadir,swot):
+    def __init__(self,nad,sw):
         ''' '''
-        NATL60.__init__(self )
+        NATL60_data.__init__(self )
         # define fake nadir cycles to merge with swot data
-        nadir.data=nadir.data.drop('ncycle')
-        nadir.data=nadir.data.expand_dims('nC')
-        _, index = np.unique(nadir.data['time'], return_index=True)
-        nadir.data=nadir.data.isel(time=index)
-        nadir.data=nadir.data.stack(z=('nC', 'time'))
-        if swot.data is not None:
-            self.data=xr.merge([nadir.data,swot.data])
+        nad.data=nad.data.drop('ncycle')
+        nad.data=nad.data.expand_dims('nC')
+        _, index = np.unique(nad.data['time'], return_index=True)
+        nad.data=nad.data.isel(time=index)
+        nad.data=nad.data.stack(z=('nC', 'time'))
+        if sw.data is not None:
+            self.data=xr.merge([nad.data,sw.data])
         else:
-            self.data=nadir.data
+            self.data=nad.data
         self.extent=[np.min(convert_lon_360_180(self.data.longitude.values)),\
                      np.max(convert_lon_360_180(self.data.longitude.values)),\
                      np.min(self.data.latitude.values),np.max(self.data.latitude.values)]
         self.gridded=False
         self.shape = tuple(self.data.dims[d] for d in ['z'])
 
-    def convert2dailyNetCDF(self,date,nadir_lag):
+    def convert2dailyNetCDF(self,date,nadir_lag,swot_lag):
         ''' '''
         date1_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=-1*nadir_lag),"%Y-%m-%d")
         date2_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=nadir_lag),"%Y-%m-%d")
@@ -33,7 +33,7 @@ class NATL60_fusion(NATL60):
         data_tmp = data_tmp.assign(time=new_time)
         if not os.path.exists(datapath+"/fusion"):
             mk_dir_recursive(datapath+"/fusion")  
-        new_file = datapath+"/fusion/NATL60-CJM165_NADIR_SWOT_"+date+"_nadlag"+str(nadir_lag)+"d.nc"
+        new_file = datapath+"/fusion/NATL60-CJM165_NADIR_SWOT_"+date+"_nadlag"+str(nadir_lag)+"d_swotlag"+str(swot_lag)+"d.nc"
         if os.path.exists(new_file):
             mode_="a"
         else:

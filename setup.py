@@ -53,7 +53,7 @@ setuptools.setup(
 
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/maxbeauchamp/natl60",
+    url="https://github.com/maxbeauchamp/NATL60",
     keywords='natl60; nadir; swot; NetCDF',
 )
 

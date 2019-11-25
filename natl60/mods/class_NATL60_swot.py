@@ -1,6 +1,6 @@
-from .class_NATL60 import *
+from .class_NATL60_data import *
 
-class NATL60_swot(NATL60):
+class NATL60_swot(NATL60_data):
     ''' NATL60_swot class definition'''
 
     @staticmethod
@@ -13,7 +13,7 @@ class NATL60_swot(NATL60):
 
     def __init__(self,list_files):
         ''' '''
-        NATL60.__init__(self )
+        NATL60_data.__init__(self )
         if len(list_files)>0:
             self.data = xr.open_mfdataset(list_files, preprocess=self.preprocess)
             self.data = self.data.rename({'lon': 'longitude',\

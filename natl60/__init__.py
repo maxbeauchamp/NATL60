@@ -9,6 +9,7 @@ __version__ = "0.0.1"
 ##################################
 import sys
 import os
+import time as timer
 from os.path import join as join_paths
 from datetime import date, datetime, timedelta
 import itertools
@@ -21,7 +22,7 @@ import builtins
 from time import sleep
 from collections import OrderedDict
 
-# assert sys.version_info >= (3,6), "Need Python>=3.6"
+assert sys.version_info >= (3,6), "Need Python>=3.6"
 
 ##################################
 # Config

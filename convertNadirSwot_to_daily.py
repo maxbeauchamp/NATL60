@@ -14,14 +14,15 @@ if __name__ == '__main__':
         data.convert2dailyNetCDF()
     # convert nadir-swot combined data
     nadir_lag=5 #(days)
+    swot_lag=0
     daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d")\
                  for x in range (0,365)]
     for date in daterange:
         date1_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=-1*nadir_lag),"%Y-%m-%d")
         date2_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=nadir_lag),"%Y-%m-%d")
         nadir=NATL60_nadir.init2(date1_nadir,date2_nadir)  
-        nadir.sel_spatial('time',[-65,-55,30,40]) 
+        nadir.sel_spatial([-65,-55,30,40]) 
         swot=NATL60_swot.init2(date,date)
         nadir_swot_fusion=NATL60_fusion(nadir,swot)
-        nadir_swot_fusion.convert2dailyNetCDF(date,nadir_lag):
+        nadir_swot_fusion.convert2dailyNetCDF(date,nadir_lag,swot_lag)
 
