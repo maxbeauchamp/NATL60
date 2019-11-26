@@ -48,7 +48,7 @@ if __name__ == '__main__':
                      np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') \
                      for dt in np.linspace(0,0.99,len(nadir_swot.data.unstack('z').time)) ]
         nadir_swot.data = (nadir_swot.data.unstack('z').assign(time=new_time)).stack(z=('nC', 'time'))
-        nadir_swot=nadir_swot.convert_on_grid('/home/user/Bureau/NATL60/src/subgrid1_natl60.txt')
+        nadir_swot=nadir_swot.convert_on_grid('/home/user/Bureau/NATL60/src/subgrid1_natl60.txt','/home/user/Bureau/NATL60/src/mask_subgrid1_natl60.txt')
         # concatenation along time
         if i != 0:
             #Gnadir=xr.concat([Gnadir,nadir],dim='time')    
@@ -59,4 +59,4 @@ if __name__ == '__main__':
             #Gswot=swot
             Gnadir_swot=nadir_swot
     # write in file
-    Gnadir_swot.to_netcdf(path='/home/user/Bureau/NATL60/dataset.nc',mode="w")
+    Gnadir_swot.to_netcdf(path='/home/user/Bureau/NATL60/dataset.nc',mode="w",unlimited_dims=["time"])
