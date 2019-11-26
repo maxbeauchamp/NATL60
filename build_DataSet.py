@@ -58,5 +58,5 @@ if __name__ == '__main__':
             #Gnadir=nadir
             #Gswot=swot
             Gnadir_swot=nadir_swot
-    # write in file
+    # write in file ()
     Gnadir_swot.to_netcdf(path='/home/user/Bureau/NATL60/dataset.nc',mode="w",unlimited_dims=["time"])
