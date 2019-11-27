@@ -28,10 +28,9 @@ class NATL60_data(NATL60):
         xi = np.searchsorted(lon,convert_lon_360_180(self.data.longitude.values)) 
         yi = np.searchsorted(lat,self.data.latitude.values)
         # convert for each time step
-        for i in range(0,len(self.data.longitude)):
-            day = np.where( time_u == time[i] )[0][0]
-            if ( (xi[i]<len(lon)) & (yi[i]<len(lat)) ):
-                ssh[ xi[i], yi[i], day] = self.data.ssh.values[i]
+        days=np.asarray([ np.where( time_u == time[i] )[0][0] for i in range(0,len(self.data.longitude)) ])
+        idx= np.where( (xi<len(lon)) & (yi<len(lat)) )
+        ssh[xi[idx], yi[idx], days[idx]]=self.data.ssh.values[idx]
         # specify xarray arguments
         if coord_grid:
             data_on_grid = xr.Dataset(\

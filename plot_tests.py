@@ -32,6 +32,6 @@ if __name__ == '__main__':
     date="2013-04-03"
     #extent=[-65.,-55.,30.,40.]
     extent=[-80.,0.,25.,65.]
-    plot_data_and_maps(date,5,"/home/user/Bureau/NATL60/plots",extent)
+    plot_data_and_maps(date,5,datapath+"/plots",extent)
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOMEDIR=/home/user/Bureau/NATL60/maps
+HOMEDIR=/home3/datawork/mbeaucha/NATL60/maps
 for i in {0..364}; do 
     day=$(date -I -d "2012-10-01 +$i days")
     yy=$(date -d $day '+%Y')
