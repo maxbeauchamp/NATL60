@@ -5,7 +5,7 @@ nadir_lag=5
 if __name__ == '__main__':
 
     daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d")\
-                 for x in range (0,30)]
+                 for x in range (0,365)]
     for i in range(0,len(daterange)):
         print(i)
         date=daterange[i]
@@ -59,6 +59,7 @@ if __name__ == '__main__':
             Gswot=swot
             Gnadir_swot=nadir_swot
     # write in file ()
-    Gnadir.to_netcdf(path=basepath+'/dataset_nadir.nc',mode="w",unlimited_dims=["time"])
-    Gswot.to_netcdf(path=basepath+'/dataset_swot.nc',mode="w",unlimited_dims=["time"])
-    Gnadir_swot.to_netcdf(path=basepath+'/dataset_nadir_swot.nc',mode="w",unlimited_dims=["time"])
+    outpath="/home3/scratch/mbeaucha/Datasets"
+    Gnadir.to_netcdf(path=outpath+'/dataset_nadir.nc',mode="w",unlimited_dims=["time"])
+    Gswot.to_netcdf(path=outpath+'/dataset_swot.nc',mode="w",unlimited_dims=["time"])
+    Gnadir_swot.to_netcdf(path=outpath+'/dataset_nadir_swot.nc',mode="w",unlimited_dims=["time"])
