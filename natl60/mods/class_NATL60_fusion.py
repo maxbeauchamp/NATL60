@@ -27,8 +27,9 @@ class NATL60_fusion(NATL60_data):
         date2_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=nadir_lag),"%Y-%m-%d")
         data_tmp = self.data.unstack('z').sel(time=slice(date1_nadir,date2_nadir))
         data_tmp = data_tmp.rename({'longitude': 'lon',\
-                                        'latitude': 'lat',\
-                                        'ssh': 'ssh_obs'}) 
+                                    'latitude': 'lat',\
+                                    'ssh_obs': 'ssh_obs',\
+                                    'ssh_mod': 'ssh_model'}) 
         new_time = [(x-np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in data_tmp.time.values]
         data_tmp = data_tmp.assign(time=new_time)
         if not os.path.exists(datapath+"/fusion"):

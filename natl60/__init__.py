@@ -62,6 +62,7 @@ from cartopy.io import shapereader
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import numpy as np
 import xarray as xr
+import xesmf as xe
 
 ##################################
 # Tools

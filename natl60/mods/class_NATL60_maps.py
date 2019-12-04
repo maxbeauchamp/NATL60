@@ -46,3 +46,38 @@ class NATL60_maps(NATL60):
             I = I - lam * slapI + lamData * (Iinit - I)
         return I
 
+    def regrid(self,var,lon_bnds=(-64,-56,0.05),lat_bnds=(31,39,0.05),time_step=None):
+        ''' regrid from curvilinear or rectangular grid to rectangular grid'''
+        ## output_grid parameters
+        # longitude
+        lon_min,lon_max,lon_step=lon_bnds
+        vlon = np.arange(lon_min, lon_max, lon_step)
+        # latitude
+        lat_min,lat_max,lat_step=lat_bnds
+        vlat = np.arange(lat_min, lat_max, lat_step)
+        ## Rename some variables for internal regridding 
+        #ds = xr.open_mfdataset(inputs, drop_variables=['crs', 'lat_bnds', 'lon_bnds'])
+        ds = self.data
+        ds = ds.rename({'longitude': 'lon', 'latitude': 'lat'})
+        ds = ds.transpose('time','lat','lon')
+        dr = ds[var]
+        ## Generate new xarray Datasets
+        ds_out    = xr.Dataset({'lat': (['lat'], vlat), 'lon': (['lon'], vlon)})
+        regridder = xe.Regridder(ds, ds_out, 'bilinear')#, periodic=True, reuse_weights=True)
+        dr_regridded = regridder(dr)
+        if len(self.data.time.values)>1:
+            # time
+            time_fmt=[datetime.strftime(datetime.utcfromtimestamp(x.astype('O')/1e9),'%Y-%m-%d') for x in self.data.time.values]
+            time_min = min(time_fmt)
+            time_max = max(time_fmt)
+            # time_step = '1D'
+            vtime = pd.date_range(time_min, time_max, freq=time_step)
+            dr_out = dr_regridded.chunk(dr_regridded.sizes).interp(time=vtime)
+        else:
+            dr_out=dr_regridded
+        dr_out.name = 'sossheig'
+        regridder.clean_weight_file()
+        del dr_regridded ; del ds ; del dr
+        return dr_out
+
+

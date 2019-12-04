@@ -22,15 +22,18 @@ class NATL60_data(NATL60):
         # time as number of days since 2012-10-01
         time = np.round(self.data.time.values/86400)
         time_u = np.sort(np.unique(time))
-        ssh = np.empty((len(lon),len(lat),len(time_u)))
-        ssh.fill(np.nan)
+        ssh_obs = np.empty((len(lon),len(lat),len(time_u)))
+        ssh_obs.fill(np.nan)
+        ssh_mod = np.empty((len(lon),len(lat),len(time_u)))
+        ssh_mod.fill(np.nan)
         # find nearest grid point from each datapoint 
         xi = np.searchsorted(lon,convert_lon_360_180(self.data.longitude.values)) 
         yi = np.searchsorted(lat,self.data.latitude.values)
         # convert for each time step
         days=np.asarray([ np.where( time_u == time[i] )[0][0] for i in range(0,len(self.data.longitude)) ])
         idx= np.where( (xi<len(lon)) & (yi<len(lat)) )
-        ssh[xi[idx], yi[idx], days[idx]]=self.data.ssh.values[idx]
+        ssh_obs[xi[idx], yi[idx], days[idx]]=self.data.ssh_obs.values[idx]
+        ssh_mod[xi[idx], yi[idx], days[idx]]=self.data.ssh_mod.values[idx]
         # specify xarray arguments
         if coord_grid:
             data_on_grid = xr.Dataset(\
@@ -38,14 +41,16 @@ class NATL60_data(NATL60):
                                    'latitude' : (('lat','lon'),mesh_lon),\
                                    'Time'     : (('time'),time_u),\
                                    'mask'     : (('lat','lon'),mask),\
-                                   'ssh'      : (('time','lat','lon'),ssh.transpose(2,1,0))},\
+                                   'ssh_obs'  : (('time','lat','lon'),ssh_obs.transpose(2,1,0)),\
+                                   'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0))},\
                         coords={'lon': lon,\
                                 'lat': lat,\
                                 'time': range(0,len(time_u))})
         else:
             data_on_grid = xr.Dataset(\
                         data_vars={'mask'     : (('lat','lon'),mask),\
-                                   'ssh'      : (('time','lat','lon'),ssh.transpose(2,1,0))},\
+                                   'ssh_obs'  : (('time','lat','lon'),ssh_obs.transpose(2,1,0)),\
+                                   'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0))},\
                         coords={'lon': lon,\
                                 'lat': lat,\
                                 'time': time_u})

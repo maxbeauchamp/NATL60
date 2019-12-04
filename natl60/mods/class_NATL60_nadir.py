@@ -18,7 +18,8 @@ class NATL60_nadir(NATL60_data):
             self.data = self.data.rename({'lon': 'longitude',\
                           'lat': 'latitude',\
                           'time': 'time',\
-                          'ssh_obs': 'ssh'})
+                          'ssh_obs': 'ssh_obs',\
+                          'ssh_model': 'ssh_mod'})
             self.data['time']=np.sort(self.data['time'].values)
             self.data = self.data.dropna('time', how='any')
             self.extent=[np.min(convert_lon_360_180(self.data.longitude.values)),\
@@ -51,9 +52,9 @@ class NATL60_nadir(NATL60_data):
         for t in daterange:
             data_tmp = self.data.sel(time=slice(t,t))
             data_tmp = data_tmp.rename({'longitude': 'lon',\
-                                         'latitude': 'lat',\
-                                         'ssh': 'ssh_obs'}) 
-
+                                        'latitude': 'lat',\
+                                        'ssh_obs': 'ssh_obs',\
+                                        'ssh_mod': 'ssh_model'})
             new_time = [(x-np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in data_tmp.time.values]
             data_tmp = data_tmp.assign(time=new_time)
             new_file = datapath+"/alongtracks/NATL60-CJM165_"+t+"_1d.nc"

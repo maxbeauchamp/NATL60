@@ -22,10 +22,12 @@ class NATL60:
             lon,lat=np.meshgrid(self.data.longitude,self.data.latitude)
             df = pd.DataFrame({'Lon': lon.flatten(),'Lat': lat.flatten(),\
                                'Time': np.repeat(self.data.time,np.prod(self.shape[0:2])),\
-                               'SSH': self.data.ssh.values.flatten()})          
+                               'Ssh_obs': self.data.ssh_obs.values.flatten(),\
+                               'Ssh_mod': self.data.ssh_mod.values.flatten()})          
         else:
             df = pd.DataFrame({'Lon': self.data.longitude,'Lat': self.data.latitude,\
-                               'Time': self.data.time, 'SSH': self.data.ssh})
+                               'Time': self.data.time, 'Ssh_obs': self.data.ssh_obs,\
+                               'Ssh_mod': self.data.ssh_mod})
         gdf = gpd.GeoDataFrame(df, crs={'init' :'epsg:4326'}, \
                        geometry=[shapely.geometry.Point(xy) for xy in zip(df.Lon, df.Lat)])
         return gdf
@@ -38,30 +40,26 @@ class NATL60:
         ''' '''
         self.cmap=cmap
     
-    def plot(self,file):
+    def plot(self,var,file):
         ''' '''
         gdf = self.gpd_fmt()
         minx, miny, maxx, maxy = gdf.geometry.total_bounds
         fig, ax = make_map(self.extent)
+        data=getattr(self.data,var)
         if self.gridded:
             lon2=(gdf.centroid.x).values.reshape(self.shape[0:2],order='F')
             lat2=(gdf.centroid.y).values.reshape(self.shape[0:2],order='F')
-            im=ax.pcolormesh(lon2, lat2, self.data.ssh.values[:,:,0], cmap=self.cmap,\
+            im=ax.pcolormesh(lon2, lat2, data.values[:,:,0], cmap=self.cmap,\
                           vmin=-2, vmax=2,edgecolors='face', alpha=1, \
                           transform= ccrs.PlateCarree(central_longitude=0.0))
         else:
             lon2=(gdf.centroid.x).values
             lat2=(gdf.centroid.y).values
-            im=ax.scatter(lon2, lat2, c=self.data.ssh.values, cmap=self.cmap, s=1,\
+            im=ax.scatter(lon2, lat2, c=data.values, cmap=self.cmap, s=1,\
                        vmin=-2, vmax=2,edgecolors='face', alpha=1, \
                        transform= ccrs.PlateCarree(central_longitude=0.0)) 
         im.set_clim(-2,2)
         clb = fig.colorbar(im, orientation="horizontal", extend='both', pad=0.1)
         clb.ax.set_title('SSH (meters)')
-        '''cax = fig.add_axes([0.12, 0, 0.8, 0.03])
-        sm = plt.cm.ScalarMappable(cmap=self.cmap, norm=plt.Normalize(vmin=-2, vmax=2))
-        sm._A = []
-        clb=fig.colorbar(sm, cax=cax, orientation="horizontal", extend='both',pad=0)
-        clb.ax.set_title('SSH (meters)')'''
         plt.savefig(file, bbox_extra_artists=(clb))
         plt.close()
