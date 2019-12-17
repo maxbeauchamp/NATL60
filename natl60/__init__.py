@@ -61,6 +61,7 @@ import cartopy.feature as cfeature
 from cartopy.io import shapereader
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import numpy as np
+from scipy.interpolate import RegularGridInterpolator
 import xarray as xr
 import xesmf as xe
 

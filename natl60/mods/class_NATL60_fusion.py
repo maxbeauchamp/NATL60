@@ -6,7 +6,6 @@ class NATL60_fusion(NATL60_data):
         ''' '''
         NATL60_data.__init__(self )
         # define fake nadir cycles to merge with swot data
-        nad.data=nad.data.drop('ncycle')
         nad.data=nad.data.expand_dims('nC')
         _, index = np.unique(nad.data['time'], return_index=True)
         nad.data=nad.data.isel(time=index)
@@ -34,9 +33,12 @@ class NATL60_fusion(NATL60_data):
         data_tmp = data_tmp.assign(time=new_time)
         if not os.path.exists(datapath+"/fusion"):
             mk_dir_recursive(datapath+"/fusion")  
-        new_file = datapath+"/fusion/NATL60-CJM165_NADIR_SWOT_"+date+"_nadlag"+str(nadir_lag)+"d_swotlag"+str(swot_lag)+"d.nc"
+        new_file = datapath+"/data/fusion/NATL60-CJM165_NADIR_SWOT_"+date+"_nadlag"+str(nadir_lag)+"d_swotlag"+str(swot_lag)+"d.nc"
         if os.path.exists(new_file):
             mode_="a"
         else:
             mode_="w"
+        mode_="w"
         data_tmp.to_netcdf(path=new_file,mode=mode_)
+
+

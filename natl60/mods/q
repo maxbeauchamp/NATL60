@@ -10,10 +10,9 @@ class NATL60_nadir(NATL60_data):
         ds = xr.decode_cf(ds)
         path=ds.encoding['source']
         # Change 0 as nan for the first cycles
-        new_ssh_obs = np.where(ds.ssh_obs.values==0., np.nan, ds.ssh_obs.values)
-        new_ssh_model = np.where(ds.ssh_model.values==0., np.nan, ds.ssh_model.values)
-        ds = ds.update({'ssh_obs':('time',new_ssh_obs)})
-        ds = ds.update({'ssh_model':('time',new_ssh_model)}) 
+        #if re.search('c01',path):
+        ds = ds.where(ds['ssh_obs'] == 0)
+        ds = ds.where(ds['ssh_model'] == 0)
         # Change time
         nm_sat = ['en','j1','g2','tpn']
         timeshift = [22.10114,3.736615,15.08489,3.731883]
@@ -23,7 +22,6 @@ class NATL60_nadir(NATL60_data):
         new_time = cftime.num2date(ds['time'].values - timeshift[index] * 24 * 3600,\
                                    units='second since 2012-10-01')
         ds['time'] = new_time
-        ds = ds.drop('ncycle')
         ds.time.attrs['units'] = 'seconds since 2012-10-01'
         ds.time.attrs['calendar'] = 'standard'
         return ds
@@ -49,14 +47,7 @@ class NATL60_nadir(NATL60_data):
                           'time': 'time',\
                           'ssh_obs': 'ssh_obs',\
                           'ssh_model': 'ssh_mod'})
-            lvar=['longitude','latitude','x_al','model_index',\
-                  'ssh_obs','ssh_mod']
-            order = np.argsort(self.data.time.values)
-            new_time = self.data.time.values[order]
-            self.data['time'] = new_time
-            for i in range(0,len(lvar)):
-                self.data = self.data.update({lvar[i]:('time',self.data[lvar[i]].values[order])})            
-            self.data = self.data.dropna('time', how='any')
+            self.data = self.data.sortby('time')
             self.extent=extent
             self.shape = tuple(self.data.dims[d] for d in ['time'])
         else:
@@ -82,7 +73,7 @@ class NATL60_nadir(NATL60_data):
         ''' '''
         daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d") for x in range (0,365)]
         for t in daterange:
-            data_tmp = self.data.sel(time=slice(t,t))
+            data_tmp = self.data.sel(time=slice(t,t)).dropna('time')
             data_tmp = data_tmp.rename({'longitude': 'lon',\
                                         'latitude': 'lat',\
                                         'ssh_obs': 'ssh_obs',\

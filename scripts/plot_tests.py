@@ -9,7 +9,8 @@ def plot_data_and_maps(date,nadir_lag,diro,extent):
     date1_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=-1*nadir_lag),"%Y-%m-%d")
     date2_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=nadir_lag),"%Y-%m-%d")
     # plot maps
-    natl60=NATL60_maps(datapath+"/maps/NATL60-CJM165_y"+yy+"m"+mm+"d"+dd+".1d_SSH.nc")  
+    natl60=NATL60_maps(datapath+"/maps/NATL60-CJM165_ssh_y2013.1y.nc")  
+    natl60.sel_time(date,date)
     natl60.set_extent(extent)  
     natl60.plot("ssh",diro+"/"+date+"/NATL60_"+date+".png")
     # plot nadir tracks in [date-nadir_lag;date+nadir_lag]

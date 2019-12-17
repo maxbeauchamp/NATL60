@@ -36,7 +36,7 @@ class NATL60_swot(NATL60_data):
         t1_fmt=datetime.strptime(t1,'%Y-%m-%d')
         t2_fmt=datetime.strptime(t2,'%Y-%m-%d')    
         daterange = [datetime.strftime(t1_fmt + timedelta(days=x),"%Y-%m-%d") for x in range(0, (t2_fmt-t1_fmt).days+1)]
-        list_files=[datapath+"/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc" for t in daterange if os.path.exists(datapath+"/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc")]
+        list_files=[datapath+"/data/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc" for t in daterange if os.path.exists(datapath+"/data/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc")]
         return cls(list_files)
 
     def sel_time(self,t1,t2):
@@ -57,7 +57,7 @@ class NATL60_swot(NATL60_data):
                                         'ssh_mod': 'ssh_model'})
             new_time = [(x-np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in data_tmp.time.values]
             data_tmp = data_tmp.assign(time=new_time)
-            new_file = datapath+"/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc"
+            new_file = datapath+"/data/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc"
             if os.path.exists(new_file):
                 mode_="a"
             else:

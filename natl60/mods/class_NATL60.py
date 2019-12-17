@@ -16,18 +16,16 @@ class NATL60:
                           (self.data.latitude.values <= extent[3]) )[0]
         self.data = self.data.isel(time=index)
 
-    def gpd_fmt(self):
+    def gpd_fmt(self,var):
         ''' import via pandas and convert in geopandas '''
         if self.gridded:
             lon,lat=np.meshgrid(self.data.longitude,self.data.latitude)
             df = pd.DataFrame({'Lon': lon.flatten(),'Lat': lat.flatten(),\
                                'Time': np.repeat(self.data.time,np.prod(self.shape[0:2])),\
-                               'Ssh_obs': self.data.ssh_obs.values.flatten(),\
-                               'Ssh_mod': self.data.ssh_mod.values.flatten()})          
+                               var: self.data[var].values.flatten()})          
         else:
             df = pd.DataFrame({'Lon': self.data.longitude,'Lat': self.data.latitude,\
-                               'Time': self.data.time, 'Ssh_obs': self.data.ssh_obs,\
-                               'Ssh_mod': self.data.ssh_mod})
+                               'Time': self.data.time, var: self.data[var]})
         gdf = gpd.GeoDataFrame(df, crs={'init' :'epsg:4326'}, \
                        geometry=[shapely.geometry.Point(xy) for xy in zip(df.Lon, df.Lat)])
         return gdf
@@ -42,7 +40,7 @@ class NATL60:
     
     def plot(self,var,file):
         ''' '''
-        gdf = self.gpd_fmt()
+        gdf = self.gpd_fmt(var)
         minx, miny, maxx, maxy = gdf.geometry.total_bounds
         fig, ax = make_map(self.extent)
         data=getattr(self.data,var)
@@ -60,6 +58,6 @@ class NATL60:
                        transform= ccrs.PlateCarree(central_longitude=0.0)) 
         im.set_clim(-2,2)
         clb = fig.colorbar(im, orientation="horizontal", extend='both', pad=0.1)
-        clb.ax.set_title('SSH (meters)')
+        clb.ax.set_title(var+' (meters)')
         plt.savefig(file, bbox_extra_artists=(clb))
         plt.close()
