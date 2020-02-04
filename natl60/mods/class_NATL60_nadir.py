@@ -13,7 +13,7 @@ class NATL60_nadir(NATL60_data):
         new_ssh_obs = np.where(ds.ssh_obs.values==0., np.nan, ds.ssh_obs.values)
         new_ssh_model = np.where(ds.ssh_model.values==0., np.nan, ds.ssh_model.values)
         ds = ds.update({'ssh_obs':('time',new_ssh_obs)})
-        ds = ds.update({'ssh_model':('time',new_ssh_model)}) 
+        ds = ds.update({'ssh_model':('time',new_ssh_model)})
         # Change time
         nm_sat = ['en','j1','g2','tpn']
         timeshift = [22.10114,3.736615,15.08489,3.731883]
@@ -35,7 +35,7 @@ class NATL60_nadir(NATL60_data):
         ds = xr.decode_cf(ds)
         return ds
 
-    def __init__(self,list_files,preproc,extent=[-65,-55,30,40]):
+    def __init__(self,list_files,dateref,preproc,extent=[-65,-55,30,40]):
         ''' '''
         # preproc: 1 or 2
         NATL60_data.__init__(self)
@@ -49,13 +49,19 @@ class NATL60_nadir(NATL60_data):
                           'time': 'time',\
                           'ssh_obs': 'ssh_obs',\
                           'ssh_model': 'ssh_mod'})
+            self.data = self.data.sortby('time')
             lvar=['longitude','latitude','x_al','model_index',\
                   'ssh_obs','ssh_mod']
             order = np.argsort(self.data.time.values)
             new_time = self.data.time.values[order]
             self.data['time'] = new_time
             for i in range(0,len(lvar)):
-                self.data = self.data.update({lvar[i]:('time',self.data[lvar[i]].values[order])})            
+                self.data = self.data.update({lvar[i]:('time',self.data[lvar[i]].values[order])})
+            # add lag variable
+            lag = np.asarray([ np.round( ( (x-np.datetime64(datetime.strptime(dateref,'%Y-%m-%d'))) / np.timedelta64(1, 's'))/(3600*24),1) \
+                    for x in self.data.time.values])
+            self.data = self.data.update({'lag':('time',lag)})
+            # finalize
             self.data = self.data.dropna('time', how='any')
             self.extent=extent
             self.shape = tuple(self.data.dims[d] for d in ['time'])
@@ -65,13 +71,13 @@ class NATL60_nadir(NATL60_data):
         self.gridded=False
 
     @classmethod
-    def init2(cls,t1,t2):
+    def init2(cls,dateref,t1,t2):
         ''' '''
         t1_fmt=datetime.strptime(t1,'%Y-%m-%d')
         t2_fmt=datetime.strptime(t2,'%Y-%m-%d')    
         daterange = [datetime.strftime(t1_fmt + timedelta(days=x),"%Y-%m-%d") for x in range(0, (t2_fmt-t1_fmt).days+1)]
         list_files=[datapath+"/data/alongtracks/NATL60-CJM165_"+t+"_1d.nc" for t in daterange if os.path.exists(datapath+"/data/alongtracks/NATL60-CJM165_"+t+"_1d.nc")]
-        return cls(list_files,2)
+        return cls(list_files,dateref,2)
 
     def sel_time(self,t1,t2):
         ''' '''

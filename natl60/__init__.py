@@ -42,8 +42,8 @@ rc = {s:dict(_rc.items(s)) for s in _rc.sections() if s not in ['int','bool']}
 
 # Define paths
 dirs['datapath']  = dirs['NATL60']
-datapath="/home3/datawork/mbeaucha"
-basepath="/home3/datahome/mbeaucha/NATL60"
+datapath="/home/user/Bureau/NATL60/DATA"
+basepath="/home/user/Bureau/NATL60"
 
 '''if rc['welcome_message']:
   print("Initializing NATL60 libraries...",flush=True)'''

@@ -28,4 +28,3 @@ if __name__ == '__main__':
         nadir_swot_fusion=NATL60_fusion(nadir,swot)
         nadir_swot_fusion.convert2dailyNetCDF(date,nadir_lag,swot_lag)'''
 
-

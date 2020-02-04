@@ -54,8 +54,7 @@ class NATL60_maps(NATL60):
             I = I - lam * slapI + lamData * (Iinit - I)
         return I
 
-
-    def regrid(self,var,mask_file,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40,0.05),time_step=None):
+    def regrid(self,var,mask_file,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),time_step=None):
         ''' regrid from curvilinear or rectangular grid to rectangular grid'''
         # time_step="1D"
 

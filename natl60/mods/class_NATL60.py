@@ -38,7 +38,7 @@ class NATL60:
         ''' '''
         self.cmap=cmap
     
-    def plot(self,var,file):
+    def plot(self,var,file,vmin=-2,vmax=2):
         ''' '''
         gdf = self.gpd_fmt(var)
         minx, miny, maxx, maxy = gdf.geometry.total_bounds
@@ -48,15 +48,15 @@ class NATL60:
             lon2=(gdf.centroid.x).values.reshape(self.shape[0:2],order='F')
             lat2=(gdf.centroid.y).values.reshape(self.shape[0:2],order='F')
             im=ax.pcolormesh(lon2, lat2, data.values[:,:,0], cmap=self.cmap,\
-                          vmin=-2, vmax=2,edgecolors='face', alpha=1, \
+                          vmin=vmin, vmax=vmax,edgecolors='face', alpha=1, \
                           transform= ccrs.PlateCarree(central_longitude=0.0))
         else:
             lon2=(gdf.centroid.x).values
             lat2=(gdf.centroid.y).values
-            im=ax.scatter(lon2, lat2, c=data.values, cmap=self.cmap, s=1,\
-                       vmin=-2, vmax=2,edgecolors='face', alpha=1, \
+            im=ax.scatter(lon2%360, lat2, c=data.values, cmap=self.cmap, s=1,\
+                       vmin=vmin, vmax=vmax,edgecolors='face', alpha=1, \
                        transform= ccrs.PlateCarree(central_longitude=0.0)) 
-        im.set_clim(-2,2)
+        im.set_clim(vmin,vmax)
         clb = fig.colorbar(im, orientation="horizontal", extend='both', pad=0.1)
         clb.ax.set_title(var+' (meters)')
         plt.savefig(file, bbox_extra_artists=(clb))

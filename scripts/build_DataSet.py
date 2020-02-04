@@ -5,7 +5,7 @@ nadir_lag=5
 if __name__ == '__main__':
 
     daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d")\
-                 for x in range (0,10)]
+                 for x in range (0,365)]
     for i in range(0,len(daterange)):
         print(i)
         date=daterange[i]
@@ -14,12 +14,24 @@ if __name__ == '__main__':
                     + timedelta(days=-1*nadir_lag),"%Y-%m-%d")
         date2_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d")\
                     + timedelta(days=nadir_lag),"%Y-%m-%d")
-        nadir=NATL60_nadir.init2(date1_nadir,date2_nadir)
-        nadir.sel_spatial([-65,-55,30,40])
+        nadir=NATL60_nadir.init2(date,date1_nadir,date2_nadir)
+        nadir.sel_spatial([-65,-55,30,40])     
         # read swot
-        swot=NATL60_swot.init2(date,date)
+        swot=NATL60_swot.init2(date,date,date)
         # fusion nadir/swot
         nadir_swot=NATL60_fusion(nadir,swot)
+        if len(nadir.data.longitude)==0:
+            # create empty swot dataset 
+            time_u = (np.datetime64(datetime.strptime(date,'%Y-%m-%d'))-\
+                     np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's')
+            nadir.data=xr.Dataset(\
+                        data_vars={'longitude': (('nC','time'),np.empty((1,1))),\
+                                   'latitude' : (('nC','time'),np.empty((1,1))),\
+                                   'lag'      : (('nC','time'),np.empty((1,1))),\
+                                   'ssh_obs'      : (('nC','time'),np.empty((1,1))),\
+                                   'ssh_mod'      : (('nC','time'),np.empty((1,1)))},\
+                        coords={'nC':[0],'time': [time_u]})
+            nadir.data=nadir.data.stack(z=('nC', 'time'))
         if swot.data is None:
             # create empty swot dataset 
             time_u = (np.datetime64(datetime.strptime(date,'%Y-%m-%d'))-\
@@ -27,10 +39,23 @@ if __name__ == '__main__':
             swot.data=xr.Dataset(\
                         data_vars={'longitude': (('nC','time'),np.empty((1,1))),\
                                    'latitude' : (('nC','time'),np.empty((1,1))),\
+                                   'lag'      : (('nC','time'),np.empty((1,1))),\
                                    'ssh_obs'      : (('nC','time'),np.empty((1,1))),\
                                    'ssh_mod'      : (('nC','time'),np.empty((1,1)))},\
                         coords={'nC':[0],'time': [time_u]})
             swot.data=swot.data.stack(z=('nC', 'time'))
+        if len(nadir_swot.data.longitude)==0:
+            # create empty swot dataset 
+            time_u = (np.datetime64(datetime.strptime(date,'%Y-%m-%d'))-\
+                     np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's')
+            nadir_swot.data=xr.Dataset(\
+                        data_vars={'longitude': (('nC','time'),np.empty((1,1))),\
+                                   'latitude' : (('nC','time'),np.empty((1,1))),\
+                                   'lag'      : (('nC','time'),np.empty((1,1))),\
+                                   'ssh_obs'      : (('nC','time'),np.empty((1,1))),\
+                                   'ssh_mod'      : (('nC','time'),np.empty((1,1)))},\
+                        coords={'nC':[0],'time': [time_u]})
+            nadir_swot.data=nadir_swot.data.stack(z=('nC', 'time'))
         # add anomaly variables to dataset
         OI=NATL60_maps(datapath+"/"+'oi/ssh_NATL60_4nadir.nc')
         nadir.anomaly(OI,"ssh_mod","ssh_mod","anomaly_mod")
@@ -69,9 +94,7 @@ if __name__ == '__main__':
             Gswot=swot
             Gnadir_swot=nadir_swot
     # write in file ()
-    outpath="/home3/scratch/mbeaucha/Datasets"
-    Gnadir.to_netcdf(path=outpath+'/dataset_nadir.nc',mode="w",unlimited_dims=["time"])
+    outpath="/home/user/Bureau"
+    Gnadir.to_netcdf(path=outpath+'/dataset_nadir_'+str(nadir_lag)+'d.nc',mode="w",unlimited_dims=["time"])
     Gswot.to_netcdf(path=outpath+'/dataset_swot.nc',mode="w",unlimited_dims=["time"])
-    Gnadir_swot.to_netcdf(path=outpath+'/dataset_nadir_swot.nc',mode="w",unlimited_dims=["time"])
-
-
+    Gnadir_swot.to_netcdf(path=outpath+'/dataset_nadir_'+str(nadir_lag)+'d_swot.nc',mode="w",unlimited_dims=["time"])

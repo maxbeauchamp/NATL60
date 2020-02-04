@@ -14,11 +14,12 @@ class NATL60_fusion(NATL60_data):
             self.data=xr.merge([nad.data,sw.data])
         else:
             self.data=nad.data
-        self.extent=[np.min(convert_lon_360_180(self.data.longitude.values)),\
-                     np.max(convert_lon_360_180(self.data.longitude.values)),\
-                     np.min(self.data.latitude.values),np.max(self.data.latitude.values)]
+        if len(self.data.longitude)!=0:        
+            self.extent=[np.min(convert_lon_360_180(self.data.longitude.values)),\
+                         np.max(convert_lon_360_180(self.data.longitude.values)),\
+                   np.min(self.data.latitude.values),np.max(self.data.latitude.values)]
+            self.shape = tuple(self.data.dims[d] for d in ['z'])
         self.gridded=False
-        self.shape = tuple(self.data.dims[d] for d in ['z'])
 
     def convert2dailyNetCDF(self,date,nadir_lag,swot_lag):
         ''' '''

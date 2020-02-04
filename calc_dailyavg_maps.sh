@@ -1,11 +1,10 @@
 #!/bin/bash
 
-HOMEDIR=/home3/datawork/mbeaucha/maps
+HOMEDIR=/home/user/Bureau/NATL60/DATA/maps
 declare -a lvar=('sosaline' 'sossheig' 'sosstsst')
 declare -a lvar2=('sss' 'ssh' 'sst')
 for k in 0 1 2; do
   var=${lvar[$k]}
-  echo VAR" : "${var}
   newvar=${lvar2[$k]}
   for i in {0..364}; do 
     day=$(date -I -d "2012-10-01 +$i days")
