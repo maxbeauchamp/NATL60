@@ -1,6 +1,6 @@
 from natl60 import *
 
-nadir_lag=5
+nadir_lag=1
 
 if __name__ == '__main__':
 
