@@ -26,6 +26,7 @@ class NATL60_data(NATL60):
         time    = np.round(self.data.time.values/86400)
         time_u  = np.sort(np.unique(time))
         lag     = np.empty((len(lon),len(lat),len(time_u))) ; lag.fill(np.nan)
+        flag     = np.empty((len(lon),len(lat),len(time_u))) ; flag.fill(np.nan)
         ssh_obs = np.empty((len(lon),len(lat),len(time_u))) ; ssh_obs.fill(np.nan)
         ssh_mod = np.empty((len(lon),len(lat),len(time_u))) ; ssh_mod.fill(np.nan)
         anomaly_obs = np.empty((len(lon),len(lat),len(time_u))) ; anomaly_obs.fill(np.nan)
@@ -37,6 +38,7 @@ class NATL60_data(NATL60):
         days=np.asarray([ np.where( time_u == time[i] )[0][0] for i in range(0,len(self.data.longitude)) ])
         idx= np.where( (xi<len(lon)) & (yi<len(lat)) )
         lag[xi[idx], yi[idx], days[idx]]=self.data.lag.values[idx]
+        flag[xi[idx], yi[idx], days[idx]]=self.data.flag.values[idx]
         ssh_obs[xi[idx], yi[idx], days[idx]]=self.data.ssh_obs.values[idx]
         ssh_mod[xi[idx], yi[idx], days[idx]]=self.data.ssh_mod.values[idx]
         anomaly_obs[xi[idx], yi[idx], days[idx]]=self.data.anomaly_obs.values[idx]
@@ -49,6 +51,7 @@ class NATL60_data(NATL60):
                                    'Time'     : (('time'),time_u),\
                                    'mask'     : (('lat','lon'),mask),\
                                    'lag'      : (('time','lat','lon'),lag.transpose(2,1,0)),\
+                                   'flag'      : (('time','lat','lon'),flag.transpose(2,1,0)),\
                                    'ssh_obs'  : (('time','lat','lon'),ssh_obs.transpose(2,1,0)),\
                                    'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0)),\
                                    'anomaly_obs'  : (('time','lat','lon'),anomaly_obs.transpose(2,1,0)),\
@@ -60,6 +63,7 @@ class NATL60_data(NATL60):
             data_on_grid = xr.Dataset(\
                         data_vars={'mask'     : (('lat','lon'),mask),\
                                    'lag'      : (('time','lat','lon'),lag.transpose(2,1,0)),\
+                                   'flag'      : (('time','lat','lon'),flag.transpose(2,1,0)),\
                                    'ssh_obs'  : (('time','lat','lon'),ssh_obs.transpose(2,1,0)),\
                                    'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0)),\
                                    'anomaly_obs'  : (('time','lat','lon'),anomaly_obs.transpose(2,1,0)),\

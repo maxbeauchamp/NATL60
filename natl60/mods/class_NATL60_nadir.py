@@ -61,6 +61,9 @@ class NATL60_nadir(NATL60_data):
             lag = np.asarray([ np.round( ( (x-np.datetime64(datetime.strptime(dateref,'%Y-%m-%d'))) / np.timedelta64(1, 's'))/(3600*24),1) \
                     for x in self.data.time.values])
             self.data = self.data.update({'lag':('time',lag)})
+            # add flag variable (nadir=0, swot=1)
+            flag = np.repeat(0,len(self.data.time.values))
+            self.data = self.data.update({'flag':('time',flag)})
             # finalize
             self.data = self.data.dropna('time', how='any')
             self.extent=extent

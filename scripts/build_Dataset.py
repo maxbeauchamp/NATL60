@@ -1,6 +1,6 @@
 from natl60 import *
 
-nadir_lag=1
+nadir_lag=int(sys.argv[1])
 
 if __name__ == '__main__':
 
@@ -28,6 +28,7 @@ if __name__ == '__main__':
                         data_vars={'longitude': (('nC','time'),np.empty((1,1))),\
                                    'latitude' : (('nC','time'),np.empty((1,1))),\
                                    'lag'      : (('nC','time'),np.empty((1,1))),\
+                                   'flag'      : (('nC','time'),np.empty((1,1))),\
                                    'ssh_obs'      : (('nC','time'),np.empty((1,1))),\
                                    'ssh_mod'      : (('nC','time'),np.empty((1,1)))},\
                         coords={'nC':[0],'time': [time_u]})
@@ -40,6 +41,7 @@ if __name__ == '__main__':
                         data_vars={'longitude': (('nC','time'),np.empty((1,1))),\
                                    'latitude' : (('nC','time'),np.empty((1,1))),\
                                    'lag'      : (('nC','time'),np.empty((1,1))),\
+                                   'flag'      : (('nC','time'),np.empty((1,1))),\
                                    'ssh_obs'      : (('nC','time'),np.empty((1,1))),\
                                    'ssh_mod'      : (('nC','time'),np.empty((1,1)))},\
                         coords={'nC':[0],'time': [time_u]})
@@ -52,6 +54,7 @@ if __name__ == '__main__':
                         data_vars={'longitude': (('nC','time'),np.empty((1,1))),\
                                    'latitude' : (('nC','time'),np.empty((1,1))),\
                                    'lag'      : (('nC','time'),np.empty((1,1))),\
+                                   'flag'      : (('nC','time'),np.empty((1,1))),\
                                    'ssh_obs'      : (('nC','time'),np.empty((1,1))),\
                                    'ssh_mod'      : (('nC','time'),np.empty((1,1)))},\
                         coords={'nC':[0],'time': [time_u]})
