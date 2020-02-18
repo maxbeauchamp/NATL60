@@ -6,7 +6,8 @@ if __name__ == '__main__':
 
     daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d")\
                  for x in range (0,365)]
-    for i in range(0,len(daterange)):
+    #for i in range(0,len(daterange)):
+    for i in range(0,10):
         print(i)
         date=daterange[i]
         # read nadir
@@ -17,7 +18,7 @@ if __name__ == '__main__':
         nadir=NATL60_nadir.init2(date,date1_nadir,date2_nadir)
         nadir.sel_spatial([-65,-55,30,40])     
         # read swot
-        swot=NATL60_swot.init2(date,date,date)
+        swot=NATL60_swot.init2(date,date,date,"wocor")
         # fusion nadir/swot
         nadir_swot=NATL60_fusion(nadir,swot)
         if len(nadir.data.longitude)==0:

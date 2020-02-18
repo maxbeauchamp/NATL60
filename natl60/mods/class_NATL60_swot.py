@@ -11,7 +11,7 @@ class NATL60_swot(NATL60_data):
         ds = ds.stack(z=('nC', 'time'))
         return ds
 
-    def __init__(self,list_files,dateref):
+    def __init__(self,list_files,dateref,type_err):
         ''' '''
         NATL60_data.__init__(self )
         if len(list_files)>0:
@@ -28,6 +28,10 @@ class NATL60_swot(NATL60_data):
             # add flag variable (nadir=0, swot=1)
             flag = np.repeat(1,len(self.data.time.values))
             self.data = self.data.update({'flag':('z',flag)})
+            # no correlated SWOT obs errors if type_err=="wocor"
+            if type_err=="wocor":
+                self.data.update({'obs':('z',\
+                                   self.data.ssh_mod.values+self.data.karin_err.values)})
             # finalize
             self.extent=[np.min(convert_lon_360_180(self.data.longitude.values)),\
                      np.max(convert_lon_360_180(self.data.longitude.values)),\
@@ -39,13 +43,13 @@ class NATL60_swot(NATL60_data):
         self.gridded=False
 
     @classmethod
-    def init2(cls,dateref,t1,t2):
+    def init2(cls,dateref,t1,t2,type_err):
         ''' '''
         t1_fmt=datetime.strptime(t1,'%Y-%m-%d')
         t2_fmt=datetime.strptime(t2,'%Y-%m-%d')    
         daterange = [datetime.strftime(t1_fmt + timedelta(days=x),"%Y-%m-%d") for x in range(0, (t2_fmt-t1_fmt).days+1)]
         list_files=[datapath+"/data/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc" for t in daterange if os.path.exists(datapath+"/data/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc")]
-        return cls(list_files,dateref)
+        return cls(list_files,dateref,type_err)
 
     def sel_time(self,t1,t2):
         ''' '''

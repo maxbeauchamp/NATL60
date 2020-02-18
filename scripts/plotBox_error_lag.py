@@ -4,8 +4,8 @@ import matplotlib.dates as mdates
 datapath = "/home/user/Bureau/NATL60/DATA"
 file = netCDF4.Dataset(datapath+"/"+"data/dataset_nadir_5d.nc",'r')
 ssh_obs = file.variables["ssh_obs"][:].data.astype('float64').flatten()
-lag     = file.variables["lag"][:].data.astype('float64').flatten()
-
+lag      = file.variables["lag"][:].data.astype('float64').flatten()
+flag     = file.variables["flag"][:].flatten()
 file2 = netCDF4.Dataset(datapath+"/"+"maps/NATL60-CJM165_ssh_y2013.1y.nc",'r')
 ssh_mod = file2.variables["ssh"][:].data.astype('float64').flatten()
 
@@ -14,6 +14,14 @@ ssh_obs = ssh_obs[idx]
 ssh_mod = ssh_mod[idx]
 err=ssh_obs-ssh_mod
 lag = lag[idx]
+flag = flag[idx]
+
+idx= np.where(flag==0)[0]
+ssh_obs = ssh_obs[idx]
+ssh_mod = ssh_mod[idx]
+err=ssh_obs-ssh_mod
+lag = lag[idx]
+flag = flag[idx]
 
 dfr = pd.DataFrame(np.transpose(np.asarray([err,lag])),columns=['error','lag'])
 boxprops = dict(linestyle='-', linewidth=1, color='k')
@@ -35,7 +43,7 @@ ticklabels = [l.get_text() for l in ax.xaxis.get_ticklabels()]
 ax.xaxis.set_ticks(ticks[::10])
 ax.xaxis.set_ticklabels(ticklabels[::10])
 ax.set_ylim([-0.25,0.25])
-ax.legend()
+#ax.legend()
 plt.title('')
 fig.suptitle('')
 plt.savefig(datapath+"/"+"data/boxplot_error_lag.pdf")
