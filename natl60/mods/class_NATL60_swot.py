@@ -30,7 +30,7 @@ class NATL60_swot(NATL60_data):
             self.data = self.data.update({'flag':('z',flag)})
             # no correlated SWOT obs errors if type_err=="wocor"
             if type_err=="wocor":
-                self.data.update({'obs':('z',\
+                self.data.update({'ssh_obs':('z',\
                                    self.data.ssh_mod.values+self.data.karin_err.values)})
             # finalize
             self.extent=[np.min(convert_lon_360_180(self.data.longitude.values)),\

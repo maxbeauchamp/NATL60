@@ -6,8 +6,7 @@ if __name__ == '__main__':
 
     daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d")\
                  for x in range (0,365)]
-    #for i in range(0,len(daterange)):
-    for i in range(0,10):
+    for i in range(0,len(daterange)):
         print(i)
         date=daterange[i]
         # read nadir
