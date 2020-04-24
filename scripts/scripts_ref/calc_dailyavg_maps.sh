@@ -1,6 +1,8 @@
 #!/bin/bash
 
-HOMEDIR=/home/user/Bureau/NATL60/DATA/maps
+domain="GULFSTREAM2"
+HOMEDIR=/home/administrateur/Bureau/NATL60/RAW_DATA/ref/${domain}
+HOMEDIR2=/home/administrateur/Bureau/NATL60/DATA/${domain}/ref
 declare -a lvar=('sosaline' 'sossheig' 'sosstsst')
 declare -a lvar2=('sss' 'ssh' 'sst')
 for k in 0 1 2; do
@@ -19,7 +21,7 @@ for k in 0 1 2; do
     rm -rf ${hfile}.tmp
   done
   ldfile=`ls ${HOMEDIR}/${var}/NATL60-CJM165_${newvar}_*.1d.nc`
-  yfile=${HOMEDIR}/NATL60-CJM165_${newvar}_y${yy}.1y.nc
+  yfile=${HOMEDIR2}/NATL60-CJM165_${newvar}_y${yy}.1y.nc
   ncrcat -O ${ldfile[*]} ${yfile}
   ncrename -O -v ${var},${newvar} ${yfile}
   python3 replace_nan.py ${yfile} ${newvar}

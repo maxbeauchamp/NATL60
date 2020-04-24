@@ -8,7 +8,7 @@ class NATL60_data(NATL60):
         NATL60.__init__(self)
         #super(NATL60_maps, self).__init__()
         
-    def convert_on_grid(self,mask_file,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),coord_grid=False):
+    def convert_on_grid(self,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),coord_grid=False):
         ''' '''
         # mask_file='/home/user/Bureau/NATL60/src/mask_subgrid1_natl60.txt'
 
@@ -18,7 +18,10 @@ class NATL60_data(NATL60):
         lat_min,lat_max,lat_step=lat_bnds
         lat = np.arange(lat_min, lat_max, lat_step)
         # import maskfile
-        mask = np.genfromtxt(mask_file).T
+        if mask_file is not None:
+            mask = np.genfromtxt(mask_file).T
+        else:
+            mask = np.ones((len(lat),len(lon)))
         mesh_lat, mesh_lon = np.meshgrid(lat, lon)
         # time as string ('%Y-%m-%d')
         # time = [datetime.strftime(datetime.utcfromtimestamp(x.astype('O')/1e9),'%Y-%m-%d') for x in self.data.time.values]

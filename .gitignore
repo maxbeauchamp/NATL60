@@ -6,15 +6,8 @@
 
 *__pycache__*
 
-# Data
-*dataset*nc
-alongtracks
-maps
-swot
-fusion
-plots
-
 DATA/
-old/
+RAW_DATA/
+src/mask_GULFSTREAM2.txt
 
 

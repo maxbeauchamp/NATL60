@@ -3,17 +3,29 @@ from natl60 import *
 if __name__ == '__main__':
   
     # convert nadir files to daily NetCDF files
-    list_path = [datapath+"/data/alongtracks/"+str for str in ["en","g2","j1","tpn"] ]
+    '''list_path = [datapath+"/data/alongtracks/"+str for str in ["en","g2","j1","tpn"] ]
     list_files = list([ [ path+'/'+file for file in os.listdir(path) ] for path in list_path ])
     list_files = list(itertools.chain(*list_files))
     data=NATL60_nadir(list_files,1) 
-    data.convert2dailyNetCDF()
+    data.convert2dailyNetCDF()'''
     # convert swot files to daily NetCDF files
-    '''for i in range(1, 19):
-        print "STEP:"+str(i)
-        data=NATL60_swot(datapath+"/swot/NATL60-CJM165_SWOT_c"+str(i).zfill(2)+"*.nc")
-        data.convert2dailyNetCDF()
-    # convert nadir-swot combined data
+    domain="OSMOSIS"
+    if domain=="GULFSTREAM":
+        cyclemax=18
+    if domain=="GULFSTREAM2":
+        cyclemax=19
+    if domain=="OSMOSIS":
+        cyclemax=18
+    path = rawdatapath+"/swot/"+domain
+    '''list_files = [path+'/'+file for file in os.listdir(path) if "nadir" not in file]
+    data=NATL60_swot(list_files,dateref=None,type_err="wocor")
+    data.convert2dailyNetCDF(path)'''
+    for i in range(1, cyclemax):
+        print("CYCLE:"+str(i))
+        list_files = [path+'/'+file for file in os.listdir(path) if ( ("nadir" not in file) and ("c"+str(i).zfill(2) in file) )]
+        data=NATL60_swot(list_files,dateref=None,type_err="wocor")
+        data.convert2dailyNetCDF(path)
+    '''# convert nadir-swot combined data
     nadir_lag=5 #(days)
     swot_lag=0
     daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d")\

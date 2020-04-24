@@ -54,7 +54,7 @@ class NATL60_maps(NATL60):
             I = I - lam * slapI + lamData * (Iinit - I)
         return I
 
-    def regrid(self,var,mask_file,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),time_step=None):
+    def regrid(self,var,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),time_step=None):
         ''' regrid from curvilinear or rectangular grid to rectangular grid'''
         # time_step="1D"
 
@@ -65,8 +65,6 @@ class NATL60_maps(NATL60):
         # latitude
         lat_min,lat_max,lat_step=lat_bnds
         vlat = np.arange(lat_min, lat_max, lat_step)
-        # import maskfile
-        mask = np.genfromtxt(mask_file).T
         ## Rename some variables for internal regridding 
         ds = self.data
         ds = ds.rename({'longitude': 'lon', 'latitude': 'lat'})
@@ -88,8 +86,10 @@ class NATL60_maps(NATL60):
             dr_out=dr_regridded
         # put values where mask==1 to nan
         newval=dr_out[var].values
-        newval[:,np.where(mask==False)[0],np.where(mask==False)[1]]=np.nan
-        print(newval.shape)
+        # import maskfile
+        if mask_file is not None:
+            mask = np.genfromtxt(mask_file).T
+            newval[:,np.where(mask==False)[0],np.where(mask==False)[1]]=np.nan
         dr_out.update({var: (('time','lat','lon'),newval)})
         regridder.clean_weight_file()
         del dr_regridded ; del ds ; del dr
