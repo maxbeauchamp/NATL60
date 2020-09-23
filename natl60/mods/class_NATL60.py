@@ -21,8 +21,8 @@ class NATL60:
         if self.gridded:
             lon,lat=np.meshgrid(self.data.longitude,self.data.latitude)
             df = pd.DataFrame({'Lon': lon.flatten(),'Lat': lat.flatten(),\
-                               'Time': np.repeat(self.data.time,np.prod(self.shape[0:2])),\
-                               var: self.data[var].values.flatten()})          
+                               'Time': np.repeat(self.data.time.values[0],np.prod(self.shape[0:2])),\
+                               var: self.data[var].values[:,:,0].flatten()})          
         else:
             df = pd.DataFrame({'Lon': self.data.longitude,'Lat': self.data.latitude,\
                                'Time': self.data.time, var: self.data[var]})

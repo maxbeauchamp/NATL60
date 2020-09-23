@@ -3,11 +3,35 @@ from .class_NATL60 import *
 class NATL60_maps(NATL60):
     ''' NATL60_map class definition '''
 
+    @staticmethod
+    def preprocess(ds):
+        #ds.time.attrs['units'] = 'days since 1950-01-01'
+        #ds.time.attrs['units'] = 'seconds since 2012-10-01'
+        ds.time.attrs['units'] = 'seconds since 1981-01-01'
+        ds.time.attrs['calendar'] = 'standard'
+        ds = xr.decode_cf(ds)
+        return ds
+
+    @staticmethod
+    def preprocess_mf(ds):
+        ds = ds.rename_dims({'time_counter':'time'})
+        ds = ds.drop_vars('time_counter_bounds')
+        ds.time.attrs['units'] = 'seconds since 1958-01-01'
+        ds.time.attrs['calendar'] = 'standard'
+        ds = xr.decode_cf(ds)
+        return ds
+
     def __init__(self,file,var=None,new_var=None):
         ''' '''
         NATL60.__init__(self)
         #super(NATL60_maps, self).__init__()
-        self.data = xr.open_dataset(file)
+        if not isinstance(file,list):
+            self.data = xr.open_dataset(file)
+            #self.data.time.attrs['units'] = 'seconds since 1981-01-01'
+            #self.data.time.attrs['calendar'] = 'standard'
+            #self.data = xr.decode_cf(self.data)
+        else:
+            self.data = xr.open_mfdataset(file, preprocess=self.preprocess_mf)
         dimnames = list(self.data.dims.keys())
         if 'lon' in dimnames:
             self.data = self.data.rename({'lon': 'longitude',\
@@ -54,7 +78,7 @@ class NATL60_maps(NATL60):
             I = I - lam * slapI + lamData * (Iinit - I)
         return I
 
-    def regrid(self,var,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),time_step=None):
+    def regrid(self,var,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),time_step=None,curvilinear=False,itrp="bilinear"):
         ''' regrid from curvilinear or rectangular grid to rectangular grid'''
         # time_step="1D"
 
@@ -68,16 +92,24 @@ class NATL60_maps(NATL60):
         ## Rename some variables for internal regridding 
         ds = self.data
         ds = ds.rename({'longitude': 'lon', 'latitude': 'lat'})
-        ds = ds.transpose('time','lat','lon')
-        dr = ds[[var]]
-        ## Generate new xarray Datasets
-        ds_out    = xr.Dataset({'lat': (['lat'], vlat),\
-                                'lon': (['lon'], vlon)})
-        regridder = xe.Regridder(ds, ds_out, 'bilinear')#, periodic=True, reuse_weights=True)
+        if curvilinear==False:
+            ds = ds.transpose('time','lat','lon')
+            dr = ds[[var]]
+            ds_out = xr.Dataset({'lat': (['lat'], vlat),\
+                                    'lon': (['lon'], vlon)})
+        else:
+            ds = ds.transpose('time','y','x')
+            dr = ds[[var]]
+            vlon_mesh, vlat_mesh = np.meshgrid(vlon,vlat)
+            ds_out    = xr.Dataset({'lat': (['y','x'], vlat_mesh),\
+                                    'lon': (['y','x'], vlon_mesh)})
+        regridder = xe.Regridder(ds, ds_out, itrp)#, periodic=True, reuse_weights=True)
         dr_regridded = regridder(dr)
         if len(self.data.time.values)>1:
+            print(self.data.time.values)
             # time
-            time_fmt=[datetime.strftime(datetime.utcfromtimestamp(x.astype('O')/1e9),'%Y-%m-%d') for x in self.data.time.values]
+            time_fmt=[datetime.strftime(datetime.utcfromtimestamp(x.astype('O')/1e9),'%Y-%m-%d %H:%M:%S') for x in self.data.time.values]
+            print(time_fmt)
             time_min = min(time_fmt)
             time_max = max(time_fmt)
             vtime = pd.date_range(time_min, time_max, freq=time_step)
@@ -85,12 +117,22 @@ class NATL60_maps(NATL60):
         else:
             dr_out=dr_regridded
         # put values where mask==1 to nan
+        print(dr_out[var])
         newval=dr_out[var].values
+        # first column
+        n_lat=newval.shape[1]
+        n_lon=newval.shape[0]
+        #newval[:,0,:]=newval[:,10,:]
+        # first line 
+        #newval[:,:,0]=newval[:,:,10]   
         # import maskfile
         if mask_file is not None:
             mask = np.genfromtxt(mask_file).T
             newval[:,np.where(mask==False)[0],np.where(mask==False)[1]]=np.nan
-        dr_out.update({var: (('time','lat','lon'),newval)})
+        if curvilinear==False:
+            dr_out.update({var: (('time','lat','lon'),newval)})
+        else:
+            dr_out.update({var: (('time','y','x'),newval)})
         regridder.clean_weight_file()
         del dr_regridded ; del ds ; del dr
         return dr_out

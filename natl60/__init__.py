@@ -73,6 +73,7 @@ from .mods.tools import *
 from .mods.class_NATL60 import *
 from .mods.class_NATL60_maps import *
 from .mods.class_NATL60_nadir import *
+from .mods.class_NATL60_nadir2 import *
 from .mods.class_NATL60_swot import *
 from .mods.class_NATL60_fusion import *
 

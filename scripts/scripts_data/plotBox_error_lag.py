@@ -1,12 +1,12 @@
-from pb_anda import *
+from natl60 import *
+import netCDF4
 import matplotlib.dates as mdates
 
-datapath = "/home/user/Bureau/NATL60/DATA"
-file = netCDF4.Dataset(datapath+"/"+"data/dataset_nadir_5d.nc",'r')
+file = netCDF4.Dataset(datapath+"/GULFSTREAM/data/gridded_data_swot_wocorr/dataset_nadir_5d.nc",'r')
 ssh_obs = file.variables["ssh_obs"][:].data.astype('float64').flatten()
 lag      = file.variables["lag"][:].data.astype('float64').flatten()
 flag     = file.variables["flag"][:].flatten()
-file2 = netCDF4.Dataset(datapath+"/"+"maps/NATL60-CJM165_ssh_y2013.1y.nc",'r')
+file2 = netCDF4.Dataset(datapath+"/GULFSTREAM/ref/NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc",'r')
 ssh_mod = file2.variables["ssh"][:].data.astype('float64').flatten()
 
 idx = ~np.isnan(ssh_obs)
@@ -46,7 +46,7 @@ ax.set_ylim([-0.25,0.25])
 #ax.legend()
 plt.title('')
 fig.suptitle('')
-plt.savefig(datapath+"/"+"data/boxplot_error_lag.pdf")
+plt.savefig(datapath+"/GULFSTREAM/data/boxplot_error_lag.pdf")
 plt.close()
 
 

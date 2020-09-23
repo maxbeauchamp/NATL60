@@ -8,8 +8,8 @@ else:
 
 var='sossheig'
 newvar='ssh'
-file=datapath+"/"+domain+"/REF/NATL60"+domain+"_2012-10-01_2013-09-30.1d.nc"
-newfile=datapath+"/"+domain+"/REF/"+"NATL60-CJM165_"+domain+"_ssh_y2013.1y.tmp.nc"
+file=rawdatapath+"/ref/"+domain+"/NATL60"+domain+"_2012-10-01_2013-09-30.1d.nc"
+newfile=datapath+"/"+domain+"/ref/"+"NATL60-CJM165_"+domain+"_ssh_y2013.1y.tmp.nc"
 map=xr.open_dataset(file)
 ssh=map[var].values
 # rebuild xarray 
@@ -28,10 +28,10 @@ map.data.update({'time':(('time'),map.data.time.values-np.timedelta64(29*60+52,'
 map_=map.regrid("ssh",\
                lon_bnds=(extent[0],extent[1]+0.05,0.05),\
                lat_bnds=(extent[2],extent[3]+0.05,0.05), time_step="1D")
-time= [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") \
-       +timedelta(days=x),"%Y-%m-%d") for x in range (0,365)]  
+time= [ (np.datetime64(datetime.strptime("2012-10-01",'%Y-%m-%d')+timedelta(days=x))-\
+        np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in range (0,365)] 
 map_.update({'time':(('time'),time)})
-map_.time.attrs['units']='days since 2012-10-01'
+newmap.time.attrs['units'] = 'seconds since 2012-10-01 00:00:00'
 os.remove(newfile)
 # replace nans
 newval=map_[newvar].values
@@ -48,7 +48,7 @@ newmap = xr.Dataset(\
                coords={'lon': map_.lon.values,\
                        'lat': map_.lat.values,\
                        'time': time})
-newmap.time.attrs['units']='days since 2012-10-01 00:00:00'
-newfile=datapath+"/"+domain+"/REF/"+"NATL60-CJM165_"+domain+"_ssh_y2013.1y.nc"
+newmap.time.attrs['units'] = 'seconds since 2012-10-01 00:00:00'
+newfile=datapath+"/"+domain+"/ref/"+"NATL60-CJM165_"+domain+"_ssh_y2013.1y.nc"
 newmap.to_netcdf(newfile,mode='w',unlimited_dims=["time"])
 
