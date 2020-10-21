@@ -51,7 +51,7 @@ class NATL60_swot(NATL60_data):
         t1_fmt=datetime.strptime(t1,'%Y-%m-%d')
         t2_fmt=datetime.strptime(t2,'%Y-%m-%d')    
         daterange = [datetime.strftime(t1_fmt + timedelta(days=x),"%Y-%m-%d") for x in range(0, (t2_fmt-t1_fmt).days+1)]
-        list_files=[rawdatapath+"/swot/"+domain+"/NATL60-CJM165_SWOT_"+t+"_1d.nc" for t in daterange if os.path.exists(rawdatapath+"/swot/"+domain+"/NATL60-CJM165_SWOT_"+t+"_1d.nc")]
+        list_files=[rawdatapath+"/data/swot/"+domain+"/NATL60-CJM165_SWOT_"+t+"_1d.nc" for t in daterange if os.path.exists(rawdatapath+"/data/swot/"+domain+"/NATL60-CJM165_SWOT_"+t+"_1d.nc")]
         return cls(list_files,dateref,type_err)
 
     def sel_time(self,t1,t2):
@@ -67,6 +67,7 @@ class NATL60_swot(NATL60_data):
         for t in daterange:
             print(t)
             data_tmp = self.data.unstack('z').sel(time=slice(str(t),str(t)))
+            print("ok...")
             data_tmp = data_tmp.rename({'longitude': 'lon',\
                                         'latitude': 'lat',\
                                         'ssh_obs': 'ssh_obs',\

@@ -57,13 +57,14 @@ class NATL60_nadir(NATL60_data):
             self.data['time'] = new_time
             for i in range(0,len(lvar)):
                 self.data = self.data.update({lvar[i]:('time',self.data[lvar[i]].values[order])})
-            # add lag variable
-            lag = np.asarray([ np.round( ( (x-np.datetime64(datetime.strptime(dateref,'%Y-%m-%d'))) / np.timedelta64(1, 's'))/(3600*24),1) \
+            if len(list_files)==1:
+                # add lag variable
+                lag = np.asarray([ np.round( ( (x-np.datetime64(datetime.strptime(dateref,'%Y-%m-%d'))) / np.timedelta64(1, 's'))/(3600*24),1) \
                     for x in self.data.time.values])
-            self.data = self.data.update({'lag':('time',lag)})
-            # add flag variable (nadir=0, swot=1)
-            flag = np.repeat(0,len(self.data.time.values))
-            self.data = self.data.update({'flag':('time',flag)})
+                self.data = self.data.update({'lag':('time',lag)})
+                # add flag variable (nadir=0, swot=1)
+                flag = np.repeat(0,len(self.data.time.values))
+                self.data = self.data.update({'flag':('time',flag)})
             # finalize
             self.data = self.data.dropna('time', how='any')
             self.extent=extent
@@ -79,7 +80,7 @@ class NATL60_nadir(NATL60_data):
         t1_fmt=datetime.strptime(t1,'%Y-%m-%d')
         t2_fmt=datetime.strptime(t2,'%Y-%m-%d')    
         daterange = [datetime.strftime(t1_fmt + timedelta(days=x),"%Y-%m-%d") for x in range(0, (t2_fmt-t1_fmt).days+1)]
-        list_files=[rawdatapath+"/alongtracks/NATL60-CJM165_"+t+"_1d.nc" for t in daterange if os.path.exists(rawdatapath+"/alongtracks/NATL60-CJM165_"+t+"_1d.nc")]
+        list_files=[rawdatapath+"/data/alongtracks/NATL60-CJM165_"+t+"_1d.nc" for t in daterange if os.path.exists(rawdatapath+"/data/alongtracks/NATL60-CJM165_"+t+"_1d.nc")]
         return cls(list_files,dateref,2)
 
     def sel_time(self,t1,t2):
@@ -87,7 +88,7 @@ class NATL60_nadir(NATL60_data):
         self.data = self.data.sel(time=slice(t1,t2))
         self.shape = tuple(self.data.dims[d] for d in ['time'])
 
-    def convert2dailyNetCDF(self):
+    def convert2dailyNetCDF(self,path):
         ''' '''
         daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d") for x in range (0,365)]
         for t in daterange:
@@ -98,7 +99,7 @@ class NATL60_nadir(NATL60_data):
                                         'ssh_mod': 'ssh_model'})
             new_time = [(x-np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in data_tmp.time.values]
             data_tmp = data_tmp.assign(time=new_time)
-            new_file = rawdatapath+"/alongtracks/NATL60-CJM165_"+t+"_1d.nc"
+            new_file = path+"/NATL60-CJM165_"+t+"_1d.nc"
             if os.path.exists(new_file):
                 mode_="a"
             else:

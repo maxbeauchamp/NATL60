@@ -54,6 +54,15 @@ class NATL60_maps(NATL60):
         ''' '''
         self.data = self.data.sel(time=slice(t1,t2))
 
+    def sel_spatial(self,extent):
+        ''' '''
+        ilon = np.where( self.data.longitude.values >= extent[0] &\
+                         self.data.longitude.values <= extent[1])[0]
+        ilat = np.where( self.data.latitude.values  >= extent[2] &\
+                         self.data.latitude.values  <= extent[3])[0]
+        self.data = self.data.isel(longitude=ilon,latitude=ilat)
+
+
     def lap_diffusionMask(self,var,iter,lam,lamData=0.):
         '''@author: rfablet'''
         ## assume missing data are NaN

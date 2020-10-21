@@ -27,27 +27,12 @@ assert sys.version_info >= (3,6), "Need Python>=3.6"
 ##################################
 # Config
 ##################################
-dirs = {}
-dirs['natl60']    = os.path.dirname(os.path.abspath(__file__))
-dirs['NATL60']    = os.path.dirname(dirs['natl60'])
-
-_rc = configparser.ConfigParser()
-# Load rc files from dapper, user-home, and cwd
-_rc.read(join_paths(x,'dpr_config.ini') for x in
-    [dirs['natl60'], os.path.expanduser("~"), os.curdir])
-# Convert to dict
-rc = {s:dict(_rc.items(s)) for s in _rc.sections() if s not in ['int','bool']}
-# Parse
-#for x in _rc['bool']: rc[x] = _rc['bool'].getboolean(x)
-
 # Define paths
-dirs['datapath']  = dirs['NATL60']
-datapath="/home/administrateur/Bureau/NATL60/DATA"
-rawdatapath="/home/administrateur/Bureau/NATL60/RAW_DATA"
-basepath="/home/administrateur/Bureau/NATL60"
+datapath="/gpfswork/rech/yrf/uba22to/NATL60"
+rawdatapath="/gpfswork/rech/yrf/uba22to/NATL60_raw"
+basepath="/linkhome/rech/genimt01/uba22to/NATL60"
 
-'''if rc['welcome_message']:
-  print("Initializing NATL60 libraries...",flush=True)'''
+print("Initializing NATL60 libraries...",flush=True)
 
 ##################################
 # Scientific and mapping
@@ -73,13 +58,7 @@ from .mods.tools import *
 from .mods.class_NATL60 import *
 from .mods.class_NATL60_maps import *
 from .mods.class_NATL60_nadir import *
-from .mods.class_NATL60_nadir2 import *
 from .mods.class_NATL60_swot import *
 from .mods.class_NATL60_fusion import *
 
-'''if rc['welcome_message']:
-  print("...Done") # ... initializing Libraries
-  print("PS: Turn off this message in your configuration: dpr_config.ini")'''
-
-
-
+print("...Done") # ... initializing Libraries

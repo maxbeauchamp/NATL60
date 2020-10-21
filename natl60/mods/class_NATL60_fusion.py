@@ -21,7 +21,7 @@ class NATL60_fusion(NATL60_data):
             self.shape = tuple(self.data.dims[d] for d in ['z'])
         self.gridded=False
 
-    def convert2dailyNetCDF(self,date,nadir_lag,swot_lag):
+    def convert2dailyNetCDF(self,path,date,nadir_lag,swot_lag):
         ''' '''
         date1_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=-1*nadir_lag),"%Y-%m-%d")
         date2_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=nadir_lag),"%Y-%m-%d")
@@ -34,7 +34,7 @@ class NATL60_fusion(NATL60_data):
         data_tmp = data_tmp.assign(time=new_time)
         if not os.path.exists(datapath+"/fusion"):
             mk_dir_recursive(datapath+"/fusion")  
-        new_file = datapath+"/data/fusion/NATL60-CJM165_NADIR_SWOT_"+date+"_nadlag"+str(nadir_lag)+"d_swotlag"+str(swot_lag)+"d.nc"
+        new_file = path+"/NATL60-CJM165_NADIR_SWOT_"+date+"_nadlag"+str(nadir_lag)+"d_swotlag"+str(swot_lag)+"d.nc"
         if os.path.exists(new_file):
             mode_="a"
         else:
