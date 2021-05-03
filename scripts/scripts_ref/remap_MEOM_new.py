@@ -5,6 +5,8 @@ if domain=="OSMOSIS":
     extent=[-19.5,-11.5,45.,55.]
 if domain=="GULFSTREAM":
     extent=[-65.,-55.,33.,43.]
+if domain=='NATL':
+    extent=[-79.,7.,26.,65.]
 
 var='H'
 newvar='ssh'

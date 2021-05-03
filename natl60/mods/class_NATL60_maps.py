@@ -100,13 +100,14 @@ class NATL60_maps(NATL60):
         vlat = np.arange(lat_min, lat_max, lat_step)
         ## Rename some variables for internal regridding 
         ds = self.data
-        ds = ds.rename({'longitude': 'lon', 'latitude': 'lat'})
         if curvilinear==False:
+            ds = ds.rename({'longitude': 'lon', 'latitude': 'lat'})
             ds = ds.transpose('time','lat','lon')
             dr = ds[[var]]
             ds_out = xr.Dataset({'lat': (['lat'], vlat),\
                                     'lon': (['lon'], vlon)})
         else:
+            ds = ds.rename({'longitude': 'x', 'latitude': 'y'})
             ds = ds.transpose('time','y','x')
             dr = ds[[var]]
             vlon_mesh, vlat_mesh = np.meshgrid(vlon,vlat)

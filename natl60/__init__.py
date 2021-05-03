@@ -29,7 +29,7 @@ assert sys.version_info >= (3,6), "Need Python>=3.6"
 ##################################
 # Define paths
 datapath="/gpfswork/rech/yrf/uba22to/NATL60"
-rawdatapath="/gpfswork/rech/yrf/uba22to/NATL60_raw"
+rawdatapath="/gpfsstore/rech/yrf/uba22to/NATL60_raw"
 basepath="/linkhome/rech/genimt01/uba22to/NATL60"
 
 print("Initializing NATL60 libraries...",flush=True)

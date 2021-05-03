@@ -14,7 +14,7 @@ def mk_dir_recursive(dir_path):
 
 # function to convert lon from 0:360 to -180:180
 def convert_lon_360_180(lon):
-    return np.asarray([ ((x+180)%360)-180 for x in lon ])
+    return  ((np.asarray(lon)+180)%360)-180
 
 # generic function for cartopy-based mapping
 def make_map(extent):

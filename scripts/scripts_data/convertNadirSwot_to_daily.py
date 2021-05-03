@@ -14,24 +14,35 @@ if __name__ == '__main__':
     # convert swot files to daily NetCDF files
     cyclemax=18
     path = rawdatapath+"/data/swot"
+    '''
     for i in range(1, cyclemax):
         print("CYCLE:"+str(i))
         list_files = [path+'/'+file for file in os.listdir(path) if ( ("nadir" not in file) and ("c"+str(i).zfill(2) in file) )]
-        data=NATL60_swot(list_files,dateref=None,type_err="wocor")
-        data.convert2dailyNetCDF(path)
+        for file in list_files:
+            print(file)
+            data=NATL60_swot(file,dateref=None,type_err="wocor")
+            data.convert2dailyNetCDF(path)
+    daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d") for x in range (0,358)]
+    for date in daterange:
+        print(date)
+        list_files = [path+'/'+file for file in os.listdir(path) if (date in file) ]
+        ds = xr.open_mfdataset(list_files)
+        new_file = path+"/NATL60-CJM165_SWOT_"+date+"_1d.nc"
+        ds.to_netcdf(path=new_file,mode="w")
+    '''
     # convert nadir-swot combined data
-    for nadir_lag in range(6):
+    for nadir_lag in range(0,1):
         print('Nadir & SWOT merging... Nadir aggregation lag='+str(nadir_lag))
-        nadir_lag=5 #(days)
+        nadir_lag=0 #(days)
         swot_lag=0
         daterange = [datetime.strftime(datetime.strptime("2012-10-01","%Y-%m-%d") + timedelta(days=x),"%Y-%m-%d") for x in range (0,365)]
         for date in daterange:
             print(date)
             date1_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=-1*nadir_lag),"%Y-%m-%d")
             date2_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=nadir_lag),"%Y-%m-%d")
-            nadir=NATL60_nadir.init2(date1_nadir,date2_nadir)  
+            nadir=NATL60_nadir.init2(date,date1_nadir,date2_nadir)  
             #nadir.sel_spatial([-65,-55,30,40]) 
-            swot=NATL60_swot.init2(date,date)
+            swot=NATL60_swot.init2(date,date,date,type_err="wocor")
             nadir_swot_fusion=NATL60_fusion(nadir,swot)
-            path = rawdatapath+"/data/fusion"
-            nadir_swot_fusion.convert2dailyNetCDF(path,date,nadir_lag,swot_lag)
+            #path = rawdatapath+"/data/fusion"
+            #nadir_swot_fusion.convert2dailyNetCDF(path,date,nadir_lag,swot_lag)

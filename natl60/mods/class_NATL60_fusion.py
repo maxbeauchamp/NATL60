@@ -11,7 +11,9 @@ class NATL60_fusion(NATL60_data):
         nad.data=nad.data.isel(time=index)
         nad.data=nad.data.stack(z=('nC', 'time'))
         if sw.data is not None:
-            self.data=xr.merge([nad.data,sw.data])
+            #self.data=xr.merge([sw.data,nad.data])
+            self.data = xr.concat([sw.data[['longitude','latitude','ssh_obs','ssh_mod']],
+                                   nad.data[['longitude','latitude','ssh_obs','ssh_mod']]],dim='z')
         else:
             self.data=nad.data
         if len(self.data.longitude)!=0:        
@@ -25,12 +27,15 @@ class NATL60_fusion(NATL60_data):
         ''' '''
         date1_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=-1*nadir_lag),"%Y-%m-%d")
         date2_nadir=datetime.strftime(datetime.strptime(date,"%Y-%m-%d") + timedelta(days=nadir_lag),"%Y-%m-%d")
+        print('toto1')
+        print(self.data)
         data_tmp = self.data.unstack('z').sel(time=slice(date1_nadir,date2_nadir))
+        print('toto2')
         data_tmp = data_tmp.rename({'longitude': 'lon',\
                                     'latitude': 'lat',\
                                     'ssh_obs': 'ssh_obs',\
                                     'ssh_mod': 'ssh_model'}) 
-        new_time = [(x-np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in data_tmp.time.values]
+        new_time = (data_tmp.time.values-np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's')
         data_tmp = data_tmp.assign(time=new_time)
         if not os.path.exists(datapath+"/fusion"):
             mk_dir_recursive(datapath+"/fusion")  

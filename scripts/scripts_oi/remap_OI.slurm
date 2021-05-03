@@ -2,6 +2,7 @@
 #SBATCH -A yrf@cpu                  # nom du compte
 #SBATCH --job-name=build_dataset    # nom du job
 #SBATCH --ntasks=1                  # nombre de tâche (un unique processus ici)
+#SBATCH --cpus-per-task=40
 #SBATCH --hint=nomultithread        # on réserve des coeurs physiques et non logiques
 #SBATCH --time=00:30:00             # temps exécution maximum demande (HH:MM:SS)
 #SBATCH --output=remap_meom%j.out     # nom du fichier de sortie

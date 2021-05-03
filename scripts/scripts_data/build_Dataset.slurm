@@ -4,7 +4,7 @@
 #SBATCH --ntasks=1                  # nombre de tâche (un unique processus ici)
 #SBATCH --cpus-per-task=40
 #SBATCH --hint=nomultithread        # on réserve des coeurs physiques et non logiques
-#SBATCH --time=10:00:00             # temps exécution maximum demande (HH:MM:SS)
+#SBATCH --time=00:30:00             # temps exécution maximum demande (HH:MM:SS)
 #SBATCH --output=build_dataset%j.out     # nom du fichier de sortie
 #SBATCH --error=build_dataset%j.err      # nom du fichier erreur (ici commun avec la sortie)
  

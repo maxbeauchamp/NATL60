@@ -17,9 +17,12 @@ if domain=="OSMOSIS":
 elif domain=="GULFSTREAM":
     extent=[-65.,-55.,33.,43.]
     mask_file=None
-else: 
-    extent=[-65.,-55.,30.,40.]
+if domain=='NATL':
+    extent=[-79.,7.,26.,65.]
     mask_file=basepath+"/src/mask_"+domain+".txt"
+
+if not os.path.exists(datapath+"/"+domain+"/oi"):
+    mk_dir_recursive(datapath+"/"+domain+"/oi")
 
 ## 4NADIR
 # mod

@@ -19,7 +19,6 @@ class NATL60_nadir(NATL60_data):
         timeshift = [22.10114,3.736615,15.08489,3.731883]
         index=[i for i in range(0,len(nm_sat)) \
                if re.search(nm_sat[i],path)][0]
-        print(path)
         new_time = cftime.num2date(ds['time'].values - timeshift[index] * 24 * 3600,\
                                    units='second since 2012-10-01')
         ds['time'] = new_time

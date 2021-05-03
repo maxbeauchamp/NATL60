@@ -4,9 +4,9 @@
 #SBATCH --ntasks=1                  # nombre de tâche (un unique processus ici)
 #SBATCH --cpus-per-task=40
 #SBATCH --hint=nomultithread        # on réserve des coeurs physiques et non logiques
-#SBATCH --time=01:00:00             # temps exécution maximum demande (HH:MM:SS)
-#SBATCH --output=remap_meom%j.out     # nom du fichier de sortie
-#SBATCH --error=remap_meom%j.err      # nom du fichier erreur (ici commun avec la sortie)
+#SBATCH --time=00:10:00             # temps exécution maximum demande (HH:MM:SS)
+#SBATCH --output=create_mask%j.out     # nom du fichier de sortie
+#SBATCH --error=create_mask%j.err      # nom du fichier erreur (ici commun avec la sortie)
  
 # nettoyage des modules charges en interactif et hérités par défaut
 module purge
@@ -23,5 +23,5 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/gpfswork/rech/yrf/uba22to/esmf/lib/libO
 set -x
  
 # exécution du code
-cd /linkhome/rech/genimt01/uba22to/NATL60/scripts/scripts_ref
-python -u remap_MEOM_new.py $1
+cd /linkhome/rech/genimt01/uba22to/NATL60/src
+python -u create_mask.py $1

@@ -7,8 +7,25 @@ class NATL60_data(NATL60):
         ''' '''
         NATL60.__init__(self)
         #super(NATL60_maps, self).__init__()
-        
-    def convert_on_grid(self,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),coord_grid=False):
+
+    def filtering(self,N):
+        ''' compute filtered SSH version '''
+
+        self.data = self.data.unstack('z')
+        filter_val_obs = np.zeros(len(self.data.sat.values))
+        filter_val_mod = np.zeros(len(self.data.sat.values))
+        for sat in np.unique(self.data.sat.values):
+            idsat = np.where(self.data.sat.values == sat)[0]
+            nn = [ np.argsort(np.abs(self.data.time.values[idsat] - time))[:2*N] \
+                    for time in self.data.time.values[idsat] ]
+            filter_val_obs[idsat] = [ np.nanmean(self.data.ssh_obs.values[idsat[idtime]]) for idtime in nn ]
+            filter_val_mod[idsat] = [ np.nanmean(self.data.ssh_mod.values[idsat[idtime]]) for idtime in nn ]
+        # add filtered value
+        self.data = self.data.stack(('nC','time'))
+        self.data = self.data.assign({"ssh_obs_filtered_N"+str(N): (('z'),filter_val_obs) })
+        self.data = self.data.assign({"ssh_mod_filtered_N"+str(N): (('z'),filter_val_mod) })
+
+    def convert_on_grid(self,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),coord_grid=False, N_filter=None):
         ''' '''
         # mask_file='/home/user/Bureau/NATL60/src/mask_subgrid1_natl60.txt'
 
@@ -32,6 +49,7 @@ class NATL60_data(NATL60):
         flag     = np.empty((len(lon),len(lat),len(time_u))) ; flag.fill(np.nan)
         ssh_obs = np.empty((len(lon),len(lat),len(time_u))) ; ssh_obs.fill(np.nan)
         ssh_mod = np.empty((len(lon),len(lat),len(time_u))) ; ssh_mod.fill(np.nan)
+        sat = np.empty((len(longitude),len(latitude),len(time_u)),dtype=object) ; sat.fill(np.nan)
         anomaly_obs = np.empty((len(lon),len(lat),len(time_u))) ; anomaly_obs.fill(np.nan)
         anomaly_mod = np.empty((len(lon),len(lat),len(time_u))) ; anomaly_mod.fill(np.nan)
         # find nearest grid point from each datapoint 
@@ -44,6 +62,7 @@ class NATL60_data(NATL60):
         flag[xi[idx], yi[idx], days[idx]]=self.data.flag.values[idx]
         ssh_obs[xi[idx], yi[idx], days[idx]]=self.data.ssh_obs.values[idx]
         ssh_mod[xi[idx], yi[idx], days[idx]]=self.data.ssh_mod.values[idx]
+        sat[xi[idx], yi[idx], days[idx]]=self.data.sat.values[idx]
         anomaly_obs[xi[idx], yi[idx], days[idx]]=self.data.anomaly_obs.values[idx]
         anomaly_mod[xi[idx], yi[idx], days[idx]]=self.data.anomaly_mod.values[idx]
         # specify xarray arguments
@@ -57,6 +76,7 @@ class NATL60_data(NATL60):
                                    'flag'      : (('time','lat','lon'),flag.transpose(2,1,0)),\
                                    'ssh_obs'  : (('time','lat','lon'),ssh_obs.transpose(2,1,0)),\
                                    'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0)),\
+                                   'sat'      : (('time','lat','lon'),sat.transpose(2,1,0)),\
                                    'anomaly_obs'  : (('time','lat','lon'),anomaly_obs.transpose(2,1,0)),\
                                    'anomaly_mod'  : (('time','lat','lon'),anomaly_mod.transpose(2,1,0))},\
                         coords={'lon': lon,\
@@ -66,14 +86,25 @@ class NATL60_data(NATL60):
             data_on_grid = xr.Dataset(\
                         data_vars={'mask'     : (('lat','lon'),mask),\
                                    'lag'      : (('time','lat','lon'),lag.transpose(2,1,0)),\
-                                   'flag'      : (('time','lat','lon'),flag.transpose(2,1,0)),\
+                                   'flag'     : (('time','lat','lon'),flag.transpose(2,1,0)),\
                                    'ssh_obs'  : (('time','lat','lon'),ssh_obs.transpose(2,1,0)),\
                                    'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0)),\
+                                   'sat'      : (('time','lat','lon'),sat.transpose(2,1,0)),\
                                    'anomaly_obs'  : (('time','lat','lon'),anomaly_obs.transpose(2,1,0)),\
                                    'anomaly_mod'  : (('time','lat','lon'),anomaly_mod.transpose(2,1,0))},\
                         coords={'lon': lon,\
                                 'lat': lat,\
                                 'time': time_u})
+
+        if N_filter is not None:
+            for N in N_filter:
+                ssh_obs_filter = np.empty((len(longitude),len(latitude),len(time_u)),dtype=object) ; ssh_obs_filter.fill(np.nan)
+                ssh_obs_filter[xi[idx], yi[idx], days[idx]]=self.data["ssh_obs_filtered_N"+str(N)].values[idx]
+                data_on_grid = data_on_grid.assign({"ssh_obs_filtered_N"+str(N): (('time','lat','lon'),ssh_obs_filter.transpose(2,1,0)) })
+                ssh_mod_filter = np.empty((len(longitude),len(latitude),len(time_u)),dtype=object) ; ssh_mod_filter.fill(np.nan)
+                ssh_mod_filter[xi[idx], yi[idx], days[idx]]=self.data["ssh_mod_filtered_N"+str(N)].values[idx]
+                data_on_grid = data_on_grid.assign({"ssh_mod_filtered_N"+str(N): (('time','lat','lon'),ssh_mod_filter.transpose(2,1,0)) })
+                        
         data_on_grid.time.attrs['units']='days since 2012-10-01 00:00:00'
         return data_on_grid 
 
