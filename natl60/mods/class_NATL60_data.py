@@ -25,7 +25,7 @@ class NATL60_data(NATL60):
         self.data = self.data.assign({"ssh_obs_filtered_N"+str(N): (('z'),filter_val_obs) })
         self.data = self.data.assign({"ssh_mod_filtered_N"+str(N): (('z'),filter_val_mod) })
 
-    def convert_on_grid(self,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),coord_grid=False, N_filter=None):
+    def convert_on_grid(self,date,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),coord_grid=False, N_filter=None):
         ''' '''
         # mask_file='/home/user/Bureau/NATL60/src/mask_subgrid1_natl60.txt'
 
@@ -40,31 +40,30 @@ class NATL60_data(NATL60):
         else:
             mask = np.ones((len(lat),len(lon)))
         mesh_lat, mesh_lon = np.meshgrid(lat, lon)
-        # time as string ('%Y-%m-%d')
-        # time = [datetime.strftime(datetime.utcfromtimestamp(x.astype('O')/1e9),'%Y-%m-%d') for x in self.data.time.values]
         # time as number of days since 2012-10-01
-        time    = np.round(self.data.time.values/86400)
-        time_u  = np.sort(np.unique(time))
+        td = datetime.strptime(date,'%Y-%m-%d')\
+             -datetime.strptime("2012-10-01",'%Y-%m-%d')
+        time_u    = [td.days]
         lag     = np.empty((len(lon),len(lat),len(time_u))) ; lag.fill(np.nan)
         flag     = np.empty((len(lon),len(lat),len(time_u))) ; flag.fill(np.nan)
         ssh_obs = np.empty((len(lon),len(lat),len(time_u))) ; ssh_obs.fill(np.nan)
         ssh_mod = np.empty((len(lon),len(lat),len(time_u))) ; ssh_mod.fill(np.nan)
-        sat = np.empty((len(longitude),len(latitude),len(time_u)),dtype=object) ; sat.fill(np.nan)
-        anomaly_obs = np.empty((len(lon),len(lat),len(time_u))) ; anomaly_obs.fill(np.nan)
-        anomaly_mod = np.empty((len(lon),len(lat),len(time_u))) ; anomaly_mod.fill(np.nan)
+        #sat = np.empty((len(lon),len(lat),len(time_u)),dtype=object) ; sat.fill(np.nan)
+        #anomaly_obs = np.empty((len(lon),len(lat),len(time_u))) ; anomaly_obs.fill(np.nan)
+        #anomaly_mod = np.empty((len(lon),len(lat),len(time_u))) ; anomaly_mod.fill(np.nan)
         # find nearest grid point from each datapoint 
         xi = np.searchsorted(lon,convert_lon_360_180(self.data.longitude.values)) 
         yi = np.searchsorted(lat,self.data.latitude.values)
         # convert for each time step
-        days=np.asarray([ np.where( time_u == time[i] )[0][0] for i in range(0,len(self.data.longitude)) ])
+        days = np.repeat([0],len(self.data.longitude))
         idx= np.where( (xi<len(lon)) & (yi<len(lat)) )
         lag[xi[idx], yi[idx], days[idx]]=self.data.lag.values[idx]
         flag[xi[idx], yi[idx], days[idx]]=self.data.flag.values[idx]
         ssh_obs[xi[idx], yi[idx], days[idx]]=self.data.ssh_obs.values[idx]
         ssh_mod[xi[idx], yi[idx], days[idx]]=self.data.ssh_mod.values[idx]
-        sat[xi[idx], yi[idx], days[idx]]=self.data.sat.values[idx]
-        anomaly_obs[xi[idx], yi[idx], days[idx]]=self.data.anomaly_obs.values[idx]
-        anomaly_mod[xi[idx], yi[idx], days[idx]]=self.data.anomaly_mod.values[idx]
+        #sat[xi[idx], yi[idx], days[idx]]=self.data.sat.values[idx]
+        #anomaly_obs[xi[idx], yi[idx], days[idx]]=self.data.anomaly_obs.values[idx]
+        #anomaly_mod[xi[idx], yi[idx], days[idx]]=self.data.anomaly_mod.values[idx]
         # specify xarray arguments
         if coord_grid:
             data_on_grid = xr.Dataset(\
@@ -75,10 +74,10 @@ class NATL60_data(NATL60):
                                    'lag'      : (('time','lat','lon'),lag.transpose(2,1,0)),\
                                    'flag'      : (('time','lat','lon'),flag.transpose(2,1,0)),\
                                    'ssh_obs'  : (('time','lat','lon'),ssh_obs.transpose(2,1,0)),\
-                                   'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0)),\
-                                   'sat'      : (('time','lat','lon'),sat.transpose(2,1,0)),\
-                                   'anomaly_obs'  : (('time','lat','lon'),anomaly_obs.transpose(2,1,0)),\
-                                   'anomaly_mod'  : (('time','lat','lon'),anomaly_mod.transpose(2,1,0))},\
+                                   'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0))},\
+                                   #'sat'      : (('time','lat','lon'),sat.transpose(2,1,0)),\
+                                   #'anomaly_obs'  : (('time','lat','lon'),anomaly_obs.transpose(2,1,0)),\
+                                   #'anomaly_mod'  : (('time','lat','lon'),anomaly_mod.transpose(2,1,0))},\
                         coords={'lon': lon,\
                                 'lat': lat,\
                                 'time': range(0,len(time_u))})
@@ -88,10 +87,10 @@ class NATL60_data(NATL60):
                                    'lag'      : (('time','lat','lon'),lag.transpose(2,1,0)),\
                                    'flag'     : (('time','lat','lon'),flag.transpose(2,1,0)),\
                                    'ssh_obs'  : (('time','lat','lon'),ssh_obs.transpose(2,1,0)),\
-                                   'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0)),\
-                                   'sat'      : (('time','lat','lon'),sat.transpose(2,1,0)),\
-                                   'anomaly_obs'  : (('time','lat','lon'),anomaly_obs.transpose(2,1,0)),\
-                                   'anomaly_mod'  : (('time','lat','lon'),anomaly_mod.transpose(2,1,0))},\
+                                   'ssh_mod'  : (('time','lat','lon'),ssh_mod.transpose(2,1,0))},\
+                                   #'sat'      : (('time','lat','lon'),sat.transpose(2,1,0)),\
+                                   #'anomaly_obs'  : (('time','lat','lon'),anomaly_obs.transpose(2,1,0)),\
+                                   #'anomaly_mod'  : (('time','lat','lon'),anomaly_mod.transpose(2,1,0))},\
                         coords={'lon': lon,\
                                 'lat': lat,\
                                 'time': time_u})
