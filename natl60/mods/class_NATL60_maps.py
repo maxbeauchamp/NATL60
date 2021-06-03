@@ -139,6 +139,7 @@ class NATL60_maps(NATL60):
         if mask_file is not None:
             mask = np.genfromtxt(mask_file).T
             newval[:,np.where(mask==False)[0],np.where(mask==False)[1]]=np.nan
+            newval[:,np.where(newval[0,:,:]>1e10)[0],np.where(newval[0,:,:]>1e10)[1]]=np.nan
         if curvilinear==False:
             dr_out.update({var: (('time','lat','lon'),newval)})
         else:

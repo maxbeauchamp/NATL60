@@ -23,7 +23,6 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/gpfswork/rech/yrf/uba22to/esmf/lib/libO
 set -x
  
 # exécution du code
-cd /linkhome/rech/genimt01/uba22to/NATL60/scripts/scripts_ref
-python -u remap_MEOM_ssh_new.py $1
-#python -u remap_MEOM_sst.py $1
+cd /linkhome/rech/genimt01/uba22to/NATL60/scripts/scripts_uv
+python -u remap_MEOM_uv.py $1
 

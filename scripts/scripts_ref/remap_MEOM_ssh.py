@@ -33,7 +33,7 @@ map=NATL60_maps(newfile)
 #map.sel_spatial([extent[0]-1,extent[1]+1,\
 #                 extent[2]-1,extent[3]+1])
 #map.set_extent(extent)
-map.data.update({'time':(('time'),map.data.time.values+np.timedelta64(24*60*60,'s'))})
+map.data.update({'time':(('time'),map.data.time.values+np.timedelta64(30*60, 's'))})
 map_=map.regrid("ssh",\
                lon_bnds=(extent[0],extent[1]+0.05,0.05),\
                lat_bnds=(extent[2],extent[3]+0.05,0.05), time_step="1D")

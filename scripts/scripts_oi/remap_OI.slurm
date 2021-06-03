@@ -10,9 +10,9 @@
  
 # nettoyage des modules charges en interactif et hérités par défaut
 module purge
- 
+
 # chargement des modules
-module load tensorflow-gpu/py3/1.14-openmpi
+module load pytorch-gpu/py3/1.4.0
 module load geos/3.7.3
 module load netcdf-fortran/4.5.3-mpi-cuda netcdf-c/4.7.4-mpi-cuda parallel-netcdf/1.12.1-mpi-cuda
 

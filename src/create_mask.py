@@ -7,9 +7,9 @@ if domain=="OSMOSIS":
 elif domain=='GULFSTREAM':
     extent=[-65.,-55.,33.,43.]
 elif domain=='NATL':
-    extent=[-79.,7.,26.,65.]
+    extent=[-79.,7.,27.,65.]
 else:
     extent=[-65.,-55.,30.,40.]
 
-ssh=NATL60_maps(datapath+"/"+domain+"/ref/NATL60-CJM165_"+domain+"_ssh_y2013.1y.nc").data.ssh.values[:,:,1]
-np.savetxt(basepath+"/src/mask_"+domain+".txt",~np.isnan(ssh),fmt='%i')
+sst=NATL60_maps(datapath+"/"+domain+"/ref/NATL60-CJM165_"+domain+"_sst_y2013.1y.nc").data.sst.values[:,:,1]
+np.savetxt(basepath+"/src/mask_"+domain+".txt",~np.isnan(sst),fmt='%i')

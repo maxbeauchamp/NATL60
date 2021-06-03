@@ -18,7 +18,7 @@ elif domain=="GULFSTREAM":
     extent=[-65.,-55.,33.,43.]
     mask_file=None
 if domain=='NATL':
-    extent=[-79.,7.,26.,65.]
+    extent=[-79.,7.,27.,65.]
     mask_file=basepath+"/src/mask_"+domain+".txt"
 
 if not os.path.exists(datapath+"/"+domain+"/oi"):

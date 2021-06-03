@@ -9,7 +9,7 @@ def regrid_datasets(nadir_lag,domain):
         extent=[-65.,-55.,33.,43.]
         mask_file=None
     elif domain=='NATL':
-        extent=[-79.,7.,26.,65.]
+        extent=[-79.,7.,27.,65.]
         mask_file=basepath+"/src/mask_"+domain+".txt"
     else: 
         extent=[-65.,-55.,30.,40.]
