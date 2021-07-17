@@ -32,6 +32,8 @@ def regrid_datasets(nadir_lag,domain):
         nadir.sel_spatial(extent)     
         # read swot
         swot=NATL60_swot.init2(date,date,date,type_err="wocor")
+        if swot.data is not None:
+            swot.sel_spatial(extent)
         # fusion nadir/swot
         nadir_swot=NATL60_fusion(nadir,swot)
         nadir.data = nadir.data.unstack('z')

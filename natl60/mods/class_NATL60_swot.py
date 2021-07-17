@@ -54,6 +54,14 @@ class NATL60_swot(NATL60_data):
         list_files=[rawdatapath+"/data/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc" for t in daterange if os.path.exists(rawdatapath+"/data/swot/NATL60-CJM165_SWOT_"+t+"_1d.nc")]
         return cls(list_files,dateref,type_err)
 
+    def sel_spatial(self,extent):
+        ''' '''
+        index = np.where( (convert_lon_360_180(self.data.longitude.values) >= extent[0]) &\
+                          (convert_lon_360_180(self.data.longitude.values) <= extent[1]) &\
+                          (self.data.latitude.values >= extent[2]) &\
+                          (self.data.latitude.values <= extent[3]) )[0]
+        self.data = self.data.isel(z=index)
+
     def sel_time(self,t1,t2):
         ''' '''
         self.data = (self.data.unstack('z').sel(time=slice(t1,t2))).stack(z=('nC', 'time'))

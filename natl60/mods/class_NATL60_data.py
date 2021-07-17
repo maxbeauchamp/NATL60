@@ -27,8 +27,18 @@ class NATL60_data(NATL60):
 
     def convert_on_grid(self,date,mask_file=None,lon_bnds=(-65,-54.95,0.05),lat_bnds=(30,40.05,0.05),coord_grid=False, N_filter=None):
         ''' '''
-        # mask_file='/home/user/Bureau/NATL60/src/mask_subgrid1_natl60.txt'
 
+        def mm(ix, iy, X):
+            df = pd.DataFrame({'ix': ix,
+                   'iy': iy,
+                   'X': X},
+                    columns=['ix', 'iy', 'X'])
+            df = df.groupby(['ix', 'iy'])
+            ix = np.asarray(list(df.groups)).T[0]
+            iy = np.asarray(list(df.groups)).T[1]
+            return ix, iy, np.asarray(df.mean()['X'])
+
+        # mask_file='/home/user/Bureau/NATL60/src/mask_subgrid1_natl60.txt'
         # create lon and lat of the subdomain grid
         lon_min,lon_max,lon_step=lon_bnds
         lon = np.arange(lon_min, lon_max, lon_step)
@@ -45,7 +55,7 @@ class NATL60_data(NATL60):
              -datetime.strptime("2012-10-01",'%Y-%m-%d')
         time_u    = [td.days]
         lag     = np.empty((len(lon),len(lat),len(time_u))) ; lag.fill(np.nan)
-        flag     = np.empty((len(lon),len(lat),len(time_u))) ; flag.fill(np.nan)
+        flag    = np.empty((len(lon),len(lat),len(time_u))) ; flag.fill(np.nan)
         ssh_obs = np.empty((len(lon),len(lat),len(time_u))) ; ssh_obs.fill(np.nan)
         ssh_mod = np.empty((len(lon),len(lat),len(time_u))) ; ssh_mod.fill(np.nan)
         #sat = np.empty((len(lon),len(lat),len(time_u)),dtype=object) ; sat.fill(np.nan)
@@ -56,14 +66,18 @@ class NATL60_data(NATL60):
         yi = np.searchsorted(lat,self.data.latitude.values)
         # convert for each time step
         days = np.repeat([0],len(self.data.longitude))
-        idx= np.where( (xi<len(lon)) & (yi<len(lat)) )
-        lag[xi[idx], yi[idx], days[idx]]=self.data.lag.values[idx]
-        flag[xi[idx], yi[idx], days[idx]]=self.data.flag.values[idx]
-        ssh_obs[xi[idx], yi[idx], days[idx]]=self.data.ssh_obs.values[idx]
-        ssh_mod[xi[idx], yi[idx], days[idx]]=self.data.ssh_mod.values[idx]
-        #sat[xi[idx], yi[idx], days[idx]]=self.data.sat.values[idx]
-        #anomaly_obs[xi[idx], yi[idx], days[idx]]=self.data.anomaly_obs.values[idx]
-        #anomaly_mod[xi[idx], yi[idx], days[idx]]=self.data.anomaly_mod.values[idx]
+        idx = np.where( (xi<len(lon)) & (yi<len(lat)) & (~np.isnan(self.data.ssh_obs.values)))[0]
+        if len(idx)>1:
+            ix, iy, lag_ = mm(xi[idx], yi[idx], self.data.lag.values[idx])
+            lag[ix, iy, 0] = lag_
+            ix, iy, flag_ = mm(xi[idx], yi[idx], self.data.flag.values[idx])
+            flag[ix,iy,0] = flag_
+            ix, iy, ssh_obs_ = mm(xi[idx], yi[idx], self.data.ssh_obs.values[idx])
+            ssh_obs[ix,iy,0]= ssh_obs_
+            ix, iy, ssh_mod_ = mm(xi[idx], yi[idx], self.data.ssh_mod.values[idx])
+            ssh_mod[ix,iy,0]= ssh_mod_
+            #anomaly_obs[xi[idx], yi[idx], 0]=self.data.anomaly_obs.values[idx]
+            #anomaly_mod[xi[idx], yi[idx], 0]=self.data.anomaly_mod.values[idx]
         # specify xarray arguments
         if coord_grid:
             data_on_grid = xr.Dataset(\

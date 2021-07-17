@@ -38,7 +38,7 @@ map_=map.regrid("ssh",\
                lon_bnds=(extent[0],extent[1]+0.05,0.05),\
                lat_bnds=(extent[2],extent[3]+0.05,0.05), time_step="1D")
 time= [ (np.datetime64(datetime.strptime("2012-10-01 12:00:00",'%Y-%m-%d %H:%M:%S')+timedelta(days=x))-\
-        np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in range (0,365)] 
+        np.datetime64('2012-10-01T00:00:00Z')) / np.timedelta64(1, 's') for x in range (0,365) ] 
 map_.update({'time':(('time'),time)})
 newmap.time.attrs['units'] = 'seconds since 2012-10-01 00:00:00'
 os.remove(newfile)

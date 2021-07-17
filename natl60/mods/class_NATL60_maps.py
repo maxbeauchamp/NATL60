@@ -126,6 +126,7 @@ class NATL60_maps(NATL60):
             dr_out = dr_regridded.chunk(dr_regridded.sizes).interp(time=vtime)
         else:
             dr_out=dr_regridded
+        dr_out=dr_regridded
         # put values where mask==1 to nan
         print(dr_out[var])
         newval=dr_out[var].values
